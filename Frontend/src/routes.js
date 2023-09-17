@@ -20,7 +20,8 @@ import TableList from "views/Consultas.js";
 import mProyecto from "views/mProyecto.js"
 import mInvesgadores from "views/mInvestigadores.js"
 import mPublicaciones from "views/mPublicaciones.js"
-
+import asoInvest from "views/asoInvest.js"
+import asoArticulo from "views/asoArticulo.js"
 const dashboardRoutes = [
   {
     path: "/dashboard",
@@ -38,7 +39,7 @@ const dashboardRoutes = [
   },
   {
     path: "/MantenimientoInvestigadores",
-    name: "Mantenimiento investigadores/as",
+    name: "Mantenimiento investigadores(as)",
     icon: "nc-icon nc-circle-09",
     component: mInvesgadores,
     layout: "/admin"
@@ -54,14 +55,14 @@ const dashboardRoutes = [
     path: "/AsociarArtículo",
     name: "Asociar artículo",
     icon: "nc-icon nc-circle-09",
-    component: mPublicaciones,
+    component: asoArticulo,
     layout: "/admin"
   },
   {
     path: "/AsociarInvestigador",
     name: "Asociar investigador(a)",
     icon: "nc-icon nc-circle-09",
-    component: mPublicaciones,
+    component: asoInvest,
     layout: "/admin"
   },
   {
