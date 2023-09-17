@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import React, { useState, useEffect } from "react";
 
 // react-bootstrap components
 import {
@@ -14,7 +12,7 @@ import {
   Row,
   Col
 } from "react-bootstrap";
-//título, año de publicación, revista donde se publicó.
+
 function User() {
     const [selectedYear, setSelectedYear] = useState(""); // El año seleccionado
     const handleYearChange = (e) => {
@@ -26,6 +24,23 @@ function User() {
     for (let year = 1900; year <= currentYear; year++) {
         years.push(year);
     }
+    useEffect(() => {
+      console.log('Valor seleccionado:', selectedYear);
+    }, [selectedYear]);
+
+
+    //Aqui hay que hacer un getIDs
+    const ids = [];
+    for (let id = 0; id <= 10; id++) {
+        ids.push(id);
+    }
+    const [selectedModification, setSelectedModification] = useState("1"); // El año seleccionado
+    const handleModificationChange = (e) => {
+        setSelectedModification(e.target.value); // Actualizar el año seleccionado
+    };
+    useEffect(() => {
+      console.log('Valor seleccionado:', selectedModification);
+    }, [selectedModification]);
     return (
     <>
       <Container fluid>
@@ -51,7 +66,7 @@ function User() {
                   </Row>
                   <Row>
                     <Col md="12">
-                    <Form.Group>
+                      <Form.Group>
                         <Form.Label>Año del proyecto</Form.Label>
                             <Form.Control
                                 as="select"
@@ -63,7 +78,7 @@ function User() {
                                 {year}
                             </option>
                             ))}
-                            </Form.Control>
+                          </Form.Control>
                         </Form.Group>
                     </Col>
                   </Row>
@@ -102,6 +117,33 @@ function User() {
               <Card.Body>
                 <Form>
                   <Row>
+                    <Col md="10">
+                      <Form.Group>
+                        <Form.Label>ID de la persona</Form.Label>
+                          <Form.Control as="select">
+                            {ids.map((id) => (
+                            <option key={id} value={id}>
+                                {id}
+                            </option>
+                            ))}
+                          </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col md="12">
+                      <Form.Group>
+                        <label>Dato a modificar</label>
+                        <Form.Control as="select" value={selectedModification} onChange={handleModificationChange}> 
+                        <option value="1">Institución en la que labora</option>
+                        <option value="2">Año del proyecto</option>
+                        <option value="3">Revista de publicación</option>
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  {selectedModification === "1" && (
+                  <Row>
                     <Col md="12">
                       <Form.Group>
                         <label>institución en la que labora</label>
@@ -113,6 +155,8 @@ function User() {
                       </Form.Group>
                     </Col>
                   </Row>
+                  )}
+                  {selectedModification === "2" && (
                   <Row>
                     <Col md="12">
                     <Form.Group>
@@ -131,6 +175,8 @@ function User() {
                         </Form.Group>
                     </Col>
                   </Row>
+                  )}
+                  {selectedModification === "3" && (
                   <Row>
                     <Col md="12">
                       <Form.Group>
@@ -143,6 +189,7 @@ function User() {
                       </Form.Group>
                     </Col>
                   </Row>
+                  )}
                   <br /> {/* Salto de línea */}
                   <Button
                     className="btn-fill pull-right"
