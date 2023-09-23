@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Dashboard from "views/Dashboard.js";
+import cargarDatos from "views/cargarDatos.js";
 import TableList from "views/Consultas.js";
 import mProyecto from "views/mProyecto.js"
 import mInvesgadores from "views/mInvestigadores.js"
@@ -24,10 +24,10 @@ import asoInvest from "views/asoInvest.js"
 import asoArticulo from "views/asoArticulo.js"
 const dashboardRoutes = [
   {
-    path: "/dashboard",
+    path: "/cargarDatos",
     name: "Cargar Datos",
     icon: "nc-icon nc-chart-pie-35",
-    component: Dashboard,
+    component: cargarDatos,
     layout: "/admin"
   },
   {

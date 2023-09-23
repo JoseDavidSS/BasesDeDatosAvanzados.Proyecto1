@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import axios from "axios";
 // react-bootstrap components
 import {
   Badge,
@@ -14,6 +14,18 @@ import {
 } from "react-bootstrap";
 
 function User() {
+
+    useEffect(() => {
+      // Realiza una solicitud GET a tu servidor Flask
+      axios.get("http://localhost:8080/admin/MantenimientoPublicaciones") // Reemplaza con la URL de tu servidor Flask
+        .then((response) => {
+          console.log(response.data); // Imprime la respuesta del servidor en la consola
+        })
+        .catch((error) => {
+          console.error("Error al realizar la solicitud:", error);
+        });
+    }, []);
+
     const [selectedYear, setSelectedYear] = useState(""); // El año seleccionado
     const handleYearChange = (e) => {
         setSelectedYear(e.target.value); // Actualizar el año seleccionado
