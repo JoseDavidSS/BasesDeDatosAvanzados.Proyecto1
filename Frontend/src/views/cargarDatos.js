@@ -64,13 +64,11 @@ function CargarDatos() {
 
     // Aquí, envía los datos al backend Flask utilizando Axios
     axios.post("http://localhost:8080/admin/cargarDatos", {
-      datos: {
         investigadoresData,
         investigadoresProyData,
         proyectosData,
         publicacionesData,
-        publicacionesProyData,
-      },
+        publicacionesProyData
     })
     .then(response => {
       console.log("Datos enviados al backend con éxito:", response.data);
