@@ -61,7 +61,25 @@ function CargarDatos() {
     console.log("Proyectos Data:", proyectosData);
     console.log("Publicaciones Data:", publicacionesData);
     console.log("Publicaciones Proy Data:", publicacionesProyData);
+
+    // Aquí, envía los datos al backend Flask utilizando Axios
+    axios.post("http://localhost:8080/admin/cargarDatos", {
+      datos: {
+        investigadoresData,
+        investigadoresProyData,
+        proyectosData,
+        publicacionesData,
+        publicacionesProyData,
+      },
+    })
+    .then(response => {
+      console.log("Datos enviados al backend con éxito:", response.data);
+    })
+    .catch(error => {
+      console.error('Error al enviar datos al backend:', error);
+    });
   };
+
 
   return (
     <>
