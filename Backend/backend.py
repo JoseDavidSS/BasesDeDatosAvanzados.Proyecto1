@@ -3,9 +3,9 @@ from neo4j import GraphDatabase
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Para habilitar el Cross-Origin Resource Sharing (CORS)
+CORS(app)  # Se usa para habilitar el Cross-Origin Resource Sharing (CORS)
 
-# Configura la conexión a la base de datos Neo4j
+# Se configura la conexión a la base de datos Neo4j
 driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "12345678"))
 session=driver.session()
 
@@ -28,7 +28,7 @@ datosPublicacionesProy = []
 @app.route('/admin/cargarDatos', methods=['POST'])
 def cargar_datos():
     try:
-        # Obtén los datos enviados desde el frontend
+        # Se obtienen los datos enviados desde el frontend
         datos_investigadores = request.json.get('investigadoresData')
         datos_investigadoresProy = request.json.get('investigadoresProyData')
         datos_proyectos = request.json.get('proyectosData')
@@ -75,9 +75,7 @@ def cargar_datos():
             for nodo in datos_publicacionesProy:
                 print(nodo)
                 idProyecto = nodo['idProyecto']
-                print (idProyecto)
                 idArt = nodo['idArt']
-                print (idArt)
                 session.write_transaction(crear_nodos_publicacionesProy, idProyecto, idArt)
 
         return jsonify({"message": "Datos cargados correctamente"})
@@ -113,6 +111,56 @@ def crear_nodos_publicacionesProy(tx, idProyecto, idArt):
         "CREATE (pp:PublicacionProyecto {idProyecto: $idProyecto, idArt: $idArt})"
     )
     tx.run(query, idProyecto=idProyecto, idArt=idArt)
+
+datoCrearNombre = []
+datoCrearApellido = []
+datoCrearTituloAcademico = []
+datoCrearInstitucion = []
+datoCrearCorreo = []
+@app.route('/admin/MantenimientoInvestigadores', methods=['POST'])
+def crear_modificar_investigadores():
+    print("se va a modificar o crear un investigador")
+    try:
+        # Verificar con una bandera si es creación (1) o modificación (0).
+        dato_bandera = request.json.get('crear')
+        print(dato_bandera)
+
+        if dato_bandera == "1":
+            # Se obtienen los datos enviados desde el frontend para la creación de investigador
+            dato_crearNombre = request.json.get('crearNombreInvestigador')
+            print(dato_crearNombre)
+            dato_crearApellido = request.json.get('crearApellidoInvestigador')
+            print(dato_crearApellido)
+            dato_crearTituloAcademico = request.json.get('crearTituloAcademico')
+            print(dato_crearTituloAcademico)
+            dato_crearInstitucion = request.json.get('crearInstitucion')
+            print(dato_crearInstitucion)
+            dato_crearCorreo = request.json.get('crearCorreo')
+            print(dato_crearCorreo)
+            dato_crearNombreCompleto = dato_crearNombre + ' ' + dato_crearApellido
+            print(dato_crearNombreCompleto)
+            id = 'prueba'
+            print(id)
+
+            # Se almacenan los datos en la lista para luego agregarlos a la base de datos
+            datoCrearNombre.extend(dato_crearNombre)
+            print(datoCrearNombre)
+
+            with driver.session() as session:
+                session.write_transaction(crear_nodos_investigadores, id, dato_crearNombreCompleto, dato_crearTituloAcademico, dato_crearInstitucion, dato_crearCorreo)
+
+        if dato_bandera == "0":
+            print("por hacer")
+
+        return jsonify({"message": "Datos creados o modificados correctamente"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+def crear_investigador():
+    print("investigador creado")
+
+def modificar_investigador():
+    print("investigador modificado")
 
 if __name__ == '__main__':
     app.run(port=8080)

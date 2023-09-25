@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 // react-bootstrap components
 import {
@@ -18,6 +19,112 @@ function User() {
   for (let id = 0; id <= 10; id++) {
       ids.push(id);
   }
+
+  const [crearNombreInvestigador, setCrearNombreInvestigador] = useState("");
+  const [crearApellidoInvestigador, setCrearApellidoInvestigador] = useState("");
+  const [crearTituloAcademico, setCrearTituloAcademico] = useState("");
+  const [crearInstitucion, setCrearInstitucion] = useState("");
+  const [crearCorreo, setCrearCorreo] = useState("");
+
+  const handleCrearNombreInvestigador = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setCrearNombreInvestigador(event.target.value);
+  };
+
+  const handleCrearApellidoInvestigador = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setCrearApellidoInvestigador(event.target.value);
+  };
+
+  const handleCrearTituloAcademico = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setCrearTituloAcademico(event.target.value);
+  };
+
+  const handleCrearInstitucion = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setCrearInstitucion(event.target.value);
+  };
+
+  const handleCrearCorreo = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setCrearCorreo(event.target.value);
+  };
+
+  const [id, setId] = useState("");
+  const [modificarNombreInvestigador, setModificarNombreInvestigador] = useState("");
+  const [modificarApellidoInvestigador, setModificarApellidoInvestigador] = useState("");
+  const [modificarTituloAcademico, setModificarTituloAcademico] = useState("");
+  const [modificarInstitucion, setModificarInstitucion] = useState("");
+  const [modificarCorreo, setModificarCorreo] = useState("");
+
+  const handleId = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setId(event.target.value);
+  };
+
+  const handleModificarNombreInvestigador = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setModificarNombreInvestigador(event.target.value);
+  };
+
+  const handleModificarApellidoInvestigador = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setModificarApellidoInvestigador(event.target.value);
+  };
+
+  const handleModificarTituloAcademico = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setModificarTituloAcademico(event.target.value);
+  };
+
+  const handleModificarInstitucion = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setModificarInstitucion(event.target.value);
+  };
+
+  const handleModificarCorreo = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setModificarCorreo(event.target.value);
+  };
+
+  const handleCrearInvestigadores = () => {
+    const crear = "1";
+    console.log("Bandera:", crear);
+    console.log("Nombre:", crearNombreInvestigador);
+    console.log("Apellido:", crearApellidoInvestigador);
+    console.log("Titulo Académico:", crearTituloAcademico);
+    console.log("Institución:", crearInstitucion);
+    console.log("Correo:", crearCorreo);
+
+    // Aquí, envía los datos al backend Flask utilizando Axios
+    axios.post("http://localhost:8080/admin/MantenimientoInvestigadores?", {
+      crear,
+      crearNombreInvestigador,
+      crearApellidoInvestigador,
+      crearTituloAcademico,
+      crearInstitucion,
+      crearCorreo
+    })
+    .then(response => {
+      console.log("Datos enviados al backend con éxito:", response.data);
+    })
+    .catch(error => {
+      console.error('Error al enviar datos al backend:', error);
+    });
+  };
+
+  const handleModificarInvestigadores = () => {
+    const crear = "0";
+    console.log("Bandera:", crear);
+    console.log("ID:", id);
+    console.log("Nombre:", modificarNombreInvestigador);
+    console.log("Apellido:", modificarApellidoInvestigador);
+    console.log("Titulo Académico:", modificarTituloAcademico);
+    console.log("Institución:", modificarInstitucion);
+    console.log("Correo:", modificarCorreo);
+  };
+  
   const [selectedModification, setSelectedModification] = useState("1"); // El año seleccionado
   const handleModificationChange = (e) => {
       setSelectedModification(e.target.value); // Actualizar el año seleccionado
@@ -41,9 +148,10 @@ function User() {
                       <Form.Group>
                         <label>Nombre</label>
                         <Form.Control
-                          defaultValue=""
                           placeholder="Aldo"
                           type="text"
+                          value={crearNombreInvestigador}
+                          onChange={handleCrearNombreInvestigador}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -51,9 +159,10 @@ function User() {
                       <Form.Group>
                         <label>Apellido</label>
                         <Form.Control
-                          defaultValue=""
                           placeholder="Cambronero"
                           type="text"
+                          value={crearApellidoInvestigador}
+                          onChange={handleCrearApellidoInvestigador}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -62,7 +171,9 @@ function User() {
                     <Col md="12">
                       <Form.Group>
                         <label>Título Ácademico</label>
-                        <Form.Control as="select"> 
+                        <Form.Control as="select"
+                          value={crearTituloAcademico}
+                          onChange={handleCrearTituloAcademico}> 
                         <option value="PhD">Doctorado (PhD) </option>
                         <option value="MSc">Maestría (MSc)</option>
                         <option value="BS">Bachillerato (BS)</option>
@@ -76,9 +187,10 @@ function User() {
                       <Form.Group>
                         <label>institución en la que labora</label>
                         <Form.Control
-                          defaultValue=""
                           placeholder="UNI"
                           type="text"
+                          value={crearInstitucion}
+                          onChange={handleCrearInstitucion}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -90,6 +202,8 @@ function User() {
                         <Form.Control
                           placeholder="Email"
                           type="email"
+                          value={crearCorreo}
+                          onChange={handleCrearCorreo}
                         ></Form.Control>
                      </Form.Group>
                     </Col>
@@ -99,6 +213,7 @@ function User() {
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
+                    onClick={handleCrearInvestigadores}
                   >
                     Crear
                   </Button>
@@ -120,7 +235,9 @@ function User() {
                     <Col md="10">
                       <Form.Group>
                         <Form.Label>ID de la persona</Form.Label>
-                          <Form.Control as="select">
+                          <Form.Control as="select"
+                            value={id} 
+                            onChange={handleId}> 
                             {ids.map((id) => (
                             <option key={id} value={id}>
                                 {id}
@@ -134,7 +251,9 @@ function User() {
                     <Col md="12">
                       <Form.Group>
                         <label>Dato a modificar</label>
-                        <Form.Control as="select" value={selectedModification} onChange={handleModificationChange}> 
+                        <Form.Control as="select" 
+                          value={selectedModification} 
+                          onChange={handleModificationChange}> 
                         <option value="1">Nombre completo</option>
                         <option value="2">Título Ácademico</option>
                         <option value="3">Institución en la que labora</option>
@@ -149,9 +268,10 @@ function User() {
                       <Form.Group>
                         <label>Nombre</label>
                         <Form.Control
-                          defaultValue=""
                           placeholder="Aldo"
                           type="text"
+                          value={modificarNombreInvestigador}
+                          onChange={handleModificarNombreInvestigador}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -159,9 +279,10 @@ function User() {
                       <Form.Group>
                         <label>Apellido</label>
                         <Form.Control
-                          defaultValue=""
                           placeholder="Cambronero"
                           type="text"
+                          value={modificarApellidoInvestigador}
+                          onChange={handleModificarApellidoInvestigador}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -172,7 +293,9 @@ function User() {
                     <Col md="12">
                       <Form.Group>
                         <label>Título Ácademico</label>
-                        <Form.Control as="select"> 
+                        <Form.Control as="select"
+                          value={modificarTituloAcademico}
+                          onChange={handleModificarTituloAcademico}> 
                         <option value="PhD">Doctorado (PhD) </option>
                         <option value="MSc">Maestría (MSc)</option>
                         <option value="BS">Bachillerato (BS)</option>
@@ -188,9 +311,10 @@ function User() {
                       <Form.Group>
                         <label>institución en la que labora</label>
                         <Form.Control
-                          defaultValue=""
                           placeholder="UNI"
                           type="text"
+                          value={modificarInstitucion}
+                          onChange={handleModificarInstitucion}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -204,6 +328,8 @@ function User() {
                         <Form.Control
                           placeholder="Email"
                           type="email"
+                          value={modificarCorreo}
+                          onChange={handleModificarCorreo}
                         ></Form.Control>
                      </Form.Group>
                     </Col>
@@ -214,6 +340,7 @@ function User() {
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
+                    onClick={handleModificarInvestigadores}
                   >
                     Modificar
                   </Button>
