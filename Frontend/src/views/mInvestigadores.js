@@ -20,11 +20,17 @@ function User() {
       ids.push(id);
   }
 
+  const [crearIdInvestigador, setCrearIdInvestigador] = useState("");
   const [crearNombreInvestigador, setCrearNombreInvestigador] = useState("");
   const [crearApellidoInvestigador, setCrearApellidoInvestigador] = useState("");
   const [crearTituloAcademico, setCrearTituloAcademico] = useState("");
   const [crearInstitucion, setCrearInstitucion] = useState("");
   const [crearCorreo, setCrearCorreo] = useState("");
+
+  const handleCrearIdInvestigador = (event) => {
+    // Actualiza el estado con el valor del campo de entrada
+    setCrearIdInvestigador(event.target.value);
+  };
 
   const handleCrearNombreInvestigador = (event) => {
     // Actualiza el estado con el valor del campo de entrada
@@ -91,6 +97,7 @@ function User() {
   const handleCrearInvestigadores = () => {
     const crear = "1";
     console.log("Bandera:", crear);
+    console.log("ID:", crearIdInvestigador);
     console.log("Nombre:", crearNombreInvestigador);
     console.log("Apellido:", crearApellidoInvestigador);
     console.log("Titulo Académico:", crearTituloAcademico);
@@ -100,6 +107,7 @@ function User() {
     // Aquí, envía los datos al backend Flask utilizando Axios
     axios.post("http://localhost:8080/admin/MantenimientoInvestigadores?", {
       crear,
+      crearIdInvestigador,
       crearNombreInvestigador,
       crearApellidoInvestigador,
       crearTituloAcademico,
@@ -144,22 +152,33 @@ function User() {
               <Card.Body>
                 <Form>
                   <Row>
-                    <Col className="pr-1" md="6">
+                  <Col className="pr-1" md="4">
+                      <Form.Group>
+                        <label>ID</label>
+                        <Form.Control
+                          placeholder="Inserte ID del investigador"
+                          type="text"
+                          value={crearIdInvestigador}
+                          onChange={handleCrearIdInvestigador}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                    <Col className="pr-1" md="4">
                       <Form.Group>
                         <label>Nombre</label>
                         <Form.Control
-                          placeholder="Aldo"
+                          placeholder="Inserte nombre del investigador"
                           type="text"
                           value={crearNombreInvestigador}
                           onChange={handleCrearNombreInvestigador}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
-                    <Col className="pl-1" md="6">
+                    <Col className="pl-1" md="4">
                       <Form.Group>
                         <label>Apellido</label>
                         <Form.Control
-                          placeholder="Cambronero"
+                          placeholder="Inserte apellido del investigador"
                           type="text"
                           value={crearApellidoInvestigador}
                           onChange={handleCrearApellidoInvestigador}

@@ -112,6 +112,7 @@ def crear_nodos_publicacionesProy(tx, idProyecto, idArt):
     )
     tx.run(query, idProyecto=idProyecto, idArt=idArt)
 
+datoCrearId = []
 datoCrearNombre = []
 datoCrearApellido = []
 datoCrearTituloAcademico = []
@@ -119,14 +120,17 @@ datoCrearInstitucion = []
 datoCrearCorreo = []
 @app.route('/admin/MantenimientoInvestigadores', methods=['POST'])
 def crear_modificar_investigadores():
-    print("se va a modificar o crear un investigador")
+    print("se va a modificar o crear un investigador...")
     try:
         # Verificar con una bandera si es creación (1) o modificación (0).
         dato_bandera = request.json.get('crear')
         print(dato_bandera)
 
         if dato_bandera == "1":
+            print("se va a crear un investigador...")
             # Se obtienen los datos enviados desde el frontend para la creación de investigador
+            dato_crearId = request.json.get('crearIdInvestigador')
+            print(dato_crearId)
             dato_crearNombre = request.json.get('crearNombreInvestigador')
             print(dato_crearNombre)
             dato_crearApellido = request.json.get('crearApellidoInvestigador')
@@ -139,20 +143,21 @@ def crear_modificar_investigadores():
             print(dato_crearCorreo)
             dato_crearNombreCompleto = dato_crearNombre + ' ' + dato_crearApellido
             print(dato_crearNombreCompleto)
-            id = 'prueba'
-            print(id)
 
             # Se almacenan los datos en la lista para luego agregarlos a la base de datos
-            datoCrearNombre.extend(dato_crearNombre)
-            print(datoCrearNombre)
+            datoCrearId.extend(dato_crearId)
+            print(datoCrearId)
 
             with driver.session() as session:
-                session.write_transaction(crear_nodos_investigadores, id, dato_crearNombreCompleto, dato_crearTituloAcademico, dato_crearInstitucion, dato_crearCorreo)
+                session.write_transaction(crear_nodos_investigadores, dato_crearId, dato_crearNombreCompleto, dato_crearTituloAcademico, dato_crearInstitucion, dato_crearCorreo)
+
+            print("Investigador creado con éxito.")
 
         if dato_bandera == "0":
+            print("se va a modificar un investigador...")
             print("por hacer")
 
-        return jsonify({"message": "Datos creados o modificados correctamente"})
+        return jsonify({"message": "Datos creados o modificados correctamente."})
     except Exception as e:
         return jsonify({"error": str(e)})
 
