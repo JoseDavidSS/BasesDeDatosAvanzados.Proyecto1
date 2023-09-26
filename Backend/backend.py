@@ -118,7 +118,8 @@ datoCrearApellido = []
 datoCrearTituloAcademico = []
 datoCrearInstitucion = []
 datoCrearCorreo = []
-@app.route('/admin/MantenimientoInvestigadores', methods=['POST'])
+datoModificacionSeleccionada = []
+@app.route('/admin/MantenimientoInvestigadores', methods=['POST', 'OPTIONS'])
 def crear_modificar_investigadores():
     print("se va a modificar o crear un investigador...")
     try:
@@ -130,19 +131,19 @@ def crear_modificar_investigadores():
             print("se va a crear un investigador...")
             # Se obtienen los datos enviados desde el frontend para la creación de investigador
             dato_crearId = request.json.get('crearIdInvestigador')
-            print(dato_crearId)
+            print('ID: ' + dato_crearId)
             dato_crearNombre = request.json.get('crearNombreInvestigador')
-            print(dato_crearNombre)
+            print('Nombre: ' + dato_crearNombre)
             dato_crearApellido = request.json.get('crearApellidoInvestigador')
-            print(dato_crearApellido)
+            print('Apellido: ' + dato_crearApellido)
             dato_crearTituloAcademico = request.json.get('crearTituloAcademico')
-            print(dato_crearTituloAcademico)
+            print('Título académico: ' + dato_crearTituloAcademico)
             dato_crearInstitucion = request.json.get('crearInstitucion')
-            print(dato_crearInstitucion)
+            print('Institución donde labora: ' + dato_crearInstitucion)
             dato_crearCorreo = request.json.get('crearCorreo')
-            print(dato_crearCorreo)
+            print('Correo electrónico: ' + dato_crearCorreo)
             dato_crearNombreCompleto = dato_crearNombre + ' ' + dato_crearApellido
-            print(dato_crearNombreCompleto)
+            print('Nombre completo: ' + dato_crearNombreCompleto)
 
             # Se almacenan los datos en la lista para luego agregarlos a la base de datos
             datoCrearId.extend(dato_crearId)
@@ -155,16 +156,82 @@ def crear_modificar_investigadores():
 
         if dato_bandera == "0":
             print("se va a modificar un investigador...")
-            print("por hacer")
+
+            # Se obtienen los datos enviados desde el frontend para la creación de investigador
+            dato_modificacionSeleccionada = request.json.get('selectedModification')
+            print('Modificación seleccionada: ' + dato_modificacionSeleccionada)
+            dato_id = request.json.get('id')
+            print('ID: ' + dato_id)
+            dato_modificarNombre = request.json.get('modificarNombreInvestigador')
+            dato_modificarApellido = request.json.get('modificarApellidoInvestigador')
+            dato_modificarTituloAcademico = request.json.get('modificarTituloAcademico')
+            dato_modificarInstitucion = request.json.get('modificarInstitucion')
+            dato_modificarCorreo = request.json.get('modificarCorreo')
+            dato_modificarNombreCompleto = dato_modificarNombre + ' ' + dato_modificarApellido
+
+            # Se almacenan los datos en la lista para luego agregarlos a la base de datos
+            datoModificacionSeleccionada.extend(dato_modificacionSeleccionada)
+
+            if dato_modificacionSeleccionada == "1":
+                print("Se va a modificar nombre y apellido de investigador...")
+                print('Nombre completo: ' + dato_modificarNombreCompleto)
+                with driver.session() as session:
+                    session.write_transaction(modificar_investigador_nombre_apellido, dato_id, dato_modificarNombreCompleto)
+
+            if dato_modificacionSeleccionada == "2":
+                print('Título académico: ' + dato_modificarTituloAcademico)
+                print("Se va a modificar título académico de investigador...")
+                with driver.session() as session:
+                    session.write_transaction(modificar_investigador_titulo, dato_id, dato_modificarTituloAcademico)
+
+            if dato_modificacionSeleccionada == "3":
+                print("Se va a modificar institución de investigador...")
+                print('Institución donde labora: ' + dato_modificarInstitucion)
+                with driver.session() as session:
+                    session.write_transaction(modificar_investigador_institucion, dato_id, dato_modificarInstitucion)
+
+            if dato_modificacionSeleccionada == "4":
+                print("Se va a modificar correo de investigador...")
+                print('Correo electrónico: ' + dato_modificarCorreo)
+                with driver.session() as session:
+                    session.write_transaction(modificar_investigador_correo, dato_id, dato_modificarCorreo)
+
+            print("Investigador modificado con éxito.")
 
         return jsonify({"message": "Datos creados o modificados correctamente."})
     except Exception as e:
         return jsonify({"error": str(e)})
 
-def crear_investigador():
-    print("investigador creado")
+def modificar_investigador_nombre_apellido(tx, id, nombre_completo):
+    query = (
+        "MATCH (in:Investigador {id: $id}) "
+        "SET in.nombre_completo = $nombre_completo"
+    )
+    tx.run(query, id=id, nombre_completo=nombre_completo)
+    print("investigador modificado")
 
-def modificar_investigador():
+def modificar_investigador_titulo(tx, id, titulo):
+    query = (
+        "MATCH (in:Investigador {id: $id}) "
+        "SET in.titulo_academico = $titulo"
+    )
+    tx.run(query, id=id, titulo=titulo)
+    print("investigador modificado")
+
+def modificar_investigador_institucion(tx, id, nombre_completo):
+    query = (
+        "MATCH (in:Investigador {id: $id}) "
+        "SET in.institucion = $nombre_completo"
+    )
+    tx.run(query, id=id, nombre_completo=nombre_completo)
+    print("investigador modificado")
+
+def modificar_investigador_correo(tx, id, nombre_completo):
+    query = (
+        "MATCH (in:Investigador {id: $id}) "
+        "SET in.email = $nombre_completo"
+    )
+    tx.run(query, id=id, nombre_completo=nombre_completo)
     print("investigador modificado")
 
 if __name__ == '__main__':

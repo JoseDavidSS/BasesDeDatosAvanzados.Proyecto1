@@ -125,12 +125,31 @@ function User() {
   const handleModificarInvestigadores = () => {
     const crear = "0";
     console.log("Bandera:", crear);
+
     console.log("ID:", id);
     console.log("Nombre:", modificarNombreInvestigador);
     console.log("Apellido:", modificarApellidoInvestigador);
     console.log("Titulo Académico:", modificarTituloAcademico);
     console.log("Institución:", modificarInstitucion);
     console.log("Correo:", modificarCorreo);
+
+    // Aquí, envía los datos al backend Flask utilizando Axios
+    axios.post("http://localhost:8080/admin/MantenimientoInvestigadores?", {
+      crear,
+      selectedModification,
+      id,
+      modificarNombreInvestigador,
+      modificarApellidoInvestigador,
+      modificarTituloAcademico,
+      modificarInstitucion,
+      modificarCorreo
+    })
+    .then(response => {
+      console.log("Datos enviados al backend con éxito:", response.data);
+    })
+    .catch(error => {
+      console.error('Error al enviar datos al backend:', error);
+    });
   };
   
   const [selectedModification, setSelectedModification] = useState("1"); // El año seleccionado
