@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Card, Container, Row, Col } from "react-bootstrap";
 import Papa from "papaparse";
 import axios from "axios";
-
+import Cookies from 'js-cookie'; // Import the Cookies library
 function CargarDatos() {
   const allowedFileNames = [
     "Investigadores.csv",
@@ -54,8 +54,8 @@ function CargarDatos() {
       }
     }
   };
-
   const handlePrintData = () => {
+    Cookies.set('tipoHidden', 'true');
     console.log("Investigadores Data:", investigadoresData);
     console.log("Investigadores Proy Data:", investigadoresProyData);
     console.log("Proyectos Data:", proyectosData);
@@ -89,22 +89,22 @@ function CargarDatos() {
                 <Card.Title as="h4">Ingresar Valores CSV</Card.Title>
               </Card.Header>
               <Card.Body>
-                <input type="file" accept=".csv" onChange={handleFileChange} />
+                <input type="file" accept=".csv" onChange={handleFileChange}  style={{ width: '80%' }} />
               </Card.Body>
               <Card.Body>
-                <input type="file" accept=".csv" onChange={handleFileChange} />
+                <input type="file" accept=".csv" onChange={handleFileChange}  style={{ width: '80%' }}/>
               </Card.Body>
               <Card.Body>
-                <input type="file" accept=".csv" onChange={handleFileChange} />
+                <input type="file" accept=".csv" onChange={handleFileChange}  style={{ width: '80%' }}/>
               </Card.Body>
               <Card.Body>
-                <input type="file" accept=".csv" onChange={handleFileChange} />
+                <input type="file" accept=".csv" onChange={handleFileChange}  style={{ width: '80%' }}/>
               </Card.Body>
               <Card.Body>
-                <input type="file" accept=".csv" onChange={handleFileChange} />
+                <input type="file" accept=".csv" onChange={handleFileChange}  style={{ width: '80%' }}/>
               </Card.Body>
-              <Card.Footer>
-                <Button onClick={handlePrintData}>Imprimir Datos</Button>
+              <Card.Footer className="text-center">
+                <Button onClick={handlePrintData}>Enviar datos</Button>
               </Card.Footer>
             </Card>
           </Col>
