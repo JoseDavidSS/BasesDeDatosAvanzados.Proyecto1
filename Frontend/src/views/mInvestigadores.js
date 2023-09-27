@@ -13,6 +13,7 @@ import {
   Row,
   Col
 } from "react-bootstrap";
+
 function User() {
   //Aqui hay que hacer un getIDs
   const ids = [];
