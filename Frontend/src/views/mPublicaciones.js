@@ -15,17 +15,6 @@ import {
 
 function User() {
 
-    useEffect(() => {
-      // Realiza una solicitud GET a tu servidor Flask
-      axios.get("http://localhost:8080/admin/MantenimientoPublicaciones") // Reemplaza con la URL de tu servidor Flask
-        .then((response) => {
-          console.log(response.data); // Imprime la respuesta del servidor en la consola
-        })
-        .catch((error) => {
-          console.error("Error al realizar la solicitud:", error);
-        });
-    }, []);
-
     const [selectedYear, setSelectedYear] = useState(""); // El año seleccionado
     const handleYearChange = (e) => {
         setSelectedYear(e.target.value); // Actualizar el año seleccionado
@@ -40,12 +29,102 @@ function User() {
       console.log('Valor seleccionado:', selectedYear);
     }, [selectedYear]);
 
-
     //Aqui hay que hacer un getIDs
     const ids = [];
     for (let id = 0; id <= 10; id++) {
         ids.push(id);
     }
+
+    const [crearIdPublicacion, setCrearIdPublicacion] = useState("");
+    const [crearTituloPublicacion, setCrearTituloPublicacion] = useState("");
+    //const [crearAnnoPublicacion, setCrearAnnoPublicacion] = useState("");
+    const [crearRevistaPublicacion, setCrearRevistaPublicacion] = useState("");
+  
+    const handleCrearIdPublicacion = (event) => {
+      // Actualiza el estado con el valor del campo de entrada
+      setCrearIdPublicacion(event.target.value);
+    };
+  
+    const handleCrearTituloPublicacion = (event) => {
+      // Actualiza el estado con el valor del campo de entrada
+      setCrearTituloPublicacion(event.target.value);
+    };
+  
+    const handleCrearRevistaPublicacion = (event) => {
+      // Actualiza el estado con el valor del campo de entrada
+      setCrearRevistaPublicacion(event.target.value);
+    };
+  
+    const [id, setId] = useState("");
+    const [modificarTituloPublicacion, setModificarTituloPublicacion] = useState("");
+    //const [modificarAnnoPublicacion, setModificarAnnoPublicacion] = useState("");
+    const [modificarRevistaPublicacion, setModificarRevistaPublicacion] = useState("");
+  
+    const handleId = (event) => {
+      // Actualiza el estado con el valor del campo de entrada
+      setId(event.target.value);
+    };
+  
+    const handleModificarTituloPublicacion = (event) => {
+      // Actualiza el estado con el valor del campo de entrada
+      setModificarTituloPublicacion(event.target.value);
+    };
+  
+    const handleModificarRevistaPublicacion = (event) => {
+      // Actualiza el estado con el valor del campo de entrada
+      setModificarRevistaPublicacion(event.target.value);
+    };
+
+    const handleCrearPublicaciones = () => {
+      const crear = "1";
+      console.log("Bandera:", crear);
+      console.log("ID:", crearIdPublicacion);
+      console.log("Titulo:", crearTituloPublicacion);
+      console.log("Año:", selectedYear);
+      console.log("Revista:", crearRevistaPublicacion);
+  
+      // Aquí, envía los datos al backend Flask utilizando Axios
+      axios.post("http://localhost:8080/admin/MantenimientoPublicaciones?", {
+        crear,
+        crearIdPublicacion,
+        crearTituloPublicacion,
+        selectedYear,
+        crearRevistaPublicacion
+      })
+      .then(response => {
+        console.log("Datos enviados al backend con éxito:", response.data);
+      })
+      .catch(error => {
+        console.error('Error al enviar datos al backend:', error);
+      });
+    };
+  
+    const handleModificarPublicaciones = () => {
+      const crear = "0";
+      console.log("Bandera:", crear);
+  
+      console.log("ID:", id);
+      console.log("Titulo:", modificarTituloPublicacion);
+      console.log("Año:", selectedYear);
+      console.log("Revista:", modificarRevistaPublicacion);
+  
+      // Aquí, envía los datos al backend Flask utilizando Axios
+      axios.post("http://localhost:8080/admin/MantenimientoPublicaciones?", {
+        crear,
+        selectedModification,
+        id,
+        modificarTituloPublicacion,
+        selectedYear,
+        modificarRevistaPublicacion
+      })
+      .then(response => {
+        console.log("Datos enviados al backend con éxito:", response.data);
+      })
+      .catch(error => {
+        console.error('Error al enviar datos al backend:', error);
+      });
+    };
+
     const [selectedModification, setSelectedModification] = useState("1"); // El año seleccionado
     const handleModificationChange = (e) => {
         setSelectedModification(e.target.value); // Actualizar el año seleccionado
@@ -64,13 +143,14 @@ function User() {
               </Card.Header>
               <Card.Body>
                 <Form>
-                  <Row>
+                <Row>
                     <Col md="12">
                       <Form.Group>
-                        <label>institución en la que labora</label>
+                        <label>ID del artículo</label>
                         <Form.Control
-                          defaultValue=""
-                          placeholder="UNI"
+                          value={crearIdPublicacion}
+                          onChange={handleCrearIdPublicacion}
+                          placeholder="Ingrese el ID de la publicación"
                           type="text"
                         ></Form.Control>
                       </Form.Group>
@@ -79,7 +159,20 @@ function User() {
                   <Row>
                     <Col md="12">
                       <Form.Group>
-                        <Form.Label>Año del proyecto</Form.Label>
+                        <label>Título del artículo</label>
+                        <Form.Control
+                          value={crearTituloPublicacion}
+                          onChange={handleCrearTituloPublicacion}
+                          placeholder="Ingrese el título de la publicación"
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col md="12">
+                      <Form.Group>
+                        <Form.Label>Año de publicación</Form.Label>
                             <Form.Control
                                 as="select"
                                 value={selectedYear}
@@ -99,8 +192,9 @@ function User() {
                       <Form.Group>
                         <label>Revista de publicación</label>
                         <Form.Control
-                          defaultValue=""
-                          placeholder="Revista de Ciencias Médicas"
+                          value={crearRevistaPublicacion}
+                          onChange={handleCrearRevistaPublicacion}
+                          placeholder="Ingrese el nombre de la revista"
                           type="text"
                         ></Form.Control>
                       </Form.Group>
@@ -111,6 +205,7 @@ function User() {
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
+                    onClick={handleCrearPublicaciones}
                   >
                     Crear
                   </Button>
@@ -131,8 +226,10 @@ function User() {
                   <Row>
                     <Col md="10">
                       <Form.Group>
-                        <Form.Label>ID de la persona</Form.Label>
-                          <Form.Control as="select">
+                        <Form.Label>ID de la publicación</Form.Label>
+                          <Form.Control as="select"
+                            value={id} 
+                            onChange={handleId}>
                             {ids.map((id) => (
                             <option key={id} value={id}>
                                 {id}
@@ -145,10 +242,10 @@ function User() {
                   <Row>
                     <Col md="12">
                       <Form.Group>
-                        <label>Dato a modificar</label>
+                        <label>Dato a modificar del artículo</label>
                         <Form.Control as="select" value={selectedModification} onChange={handleModificationChange}> 
-                        <option value="1">Institución en la que labora</option>
-                        <option value="2">Año del proyecto</option>
+                        <option value="1">Título del artículo</option>
+                        <option value="2">Año de publicación</option>
                         <option value="3">Revista de publicación</option>
                         </Form.Control>
                       </Form.Group>
@@ -158,10 +255,11 @@ function User() {
                   <Row>
                     <Col md="12">
                       <Form.Group>
-                        <label>institución en la que labora</label>
+                        <label>Título del artículo</label>
                         <Form.Control
-                          defaultValue=""
-                          placeholder="UNI"
+                          value={modificarTituloPublicacion} 
+                          onChange={handleModificarTituloPublicacion}
+                          placeholder="Ingrese el nuevo título"
                           type="text"
                         ></Form.Control>
                       </Form.Group>
@@ -172,7 +270,7 @@ function User() {
                   <Row>
                     <Col md="12">
                     <Form.Group>
-                        <Form.Label>Año del proyecto</Form.Label>
+                        <Form.Label>Año de publicación</Form.Label>
                             <Form.Control
                                 as="select"
                                 value={selectedYear}
@@ -194,8 +292,9 @@ function User() {
                       <Form.Group>
                         <label>Revista de publicación</label>
                         <Form.Control
-                          defaultValue=""
-                          placeholder="Revista de Ciencias Médicas"
+                          value={modificarRevistaPublicacion} 
+                          onChange={handleModificarRevistaPublicacion}
+                          placeholder="Ingrese en nombre de la nueva revista"
                           type="text"
                         ></Form.Control>
                       </Form.Group>
@@ -207,6 +306,7 @@ function User() {
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
+                    onClick={handleModificarPublicaciones}
                   >
                     Modificar
                   </Button>
