@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 
 function User() {
@@ -10,8 +10,11 @@ function User() {
 
   const handleIdClick = (id) => {
     setlogicaId(id === logicaId ? null : id);
-    console.log("ID:",id);
   };
+
+  useEffect(() => {
+    console.log("logicaID:", logicaId);
+  }, [logicaId]);
 
   const handleProjectClick = (project) => {
     if (selectedProjects.includes(project)) {
