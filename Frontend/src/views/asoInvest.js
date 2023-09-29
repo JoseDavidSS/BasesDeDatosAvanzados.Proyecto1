@@ -1,23 +1,19 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 
 function User() {
   const inv = ["Aldo", "Jose", "Vale"];
   const proy = ["P1", "P2", "P3","P4", "P5", "P6"];  
   
-  const [Inv, setInv] = useState(null);
-  const [logicaInv, setlogicaInv] = useState("Aldo"); // State to track the selected ID
+  const [logicaInv, setlogicaInv] = useState(null); // State to track the selected ID
   const [selectedProjects, setSelectedProjects] = useState([]); // State to track selected projects
 
   const handleIdClick = (id) => {
-    if (id === logicaInv) {
-      setlogicaInv(null); // Si el mismo botón fue presionado, establece el valor en null.
-    } else {
-      setlogicaInv(id); // Si se presiona un botón diferente, establece el nuevo valor.
-    }
-    console.log("logicaInv:",logicaInv);
-    //console.log("Inv:",Inv);
+    setlogicaInv(id === logicaInv ? null : id);
   };
+  useEffect(() => {
+    console.log("logicaID:", logicaInv);
+  }, [logicaInv]);
 
   const handleProjectClick = (project) => {
     if (selectedProjects.includes(project)) {
