@@ -38,12 +38,6 @@ def cargar_datos():
                 email = nodo['email']
                 session.write_transaction(crear_nodos_investigadores, id, nombre_completo, titulo_academico, institucion, email)
 
-            for nodo in datos_investigadoresProy:
-                print(nodo)
-                idInv = nodo['idInv']
-                idProy = nodo['idProy']
-                session.write_transaction(crear_nodos_investigadoresProy, idInv, idProy)
-
             for nodo in datos_proyectos:
                 print(nodo)
                 idPry = nodo['idPry']
@@ -61,6 +55,12 @@ def cargar_datos():
                 nombre_revista = nodo['nombre_revista']
                 session.write_transaction(crear_nodos_publicaciones, idPub, titulo_publicacion, anno_publicacion, nombre_revista)
 
+            for nodo in datos_investigadoresProy:
+                print(nodo)
+                idInv = nodo['idInv']
+                idProy = nodo['idProy']
+                session.write_transaction(crear_nodos_investigadoresProy, idInv, idProy)
+
             for nodo in datos_publicacionesProy:
                 print(nodo)
                 idProyecto = nodo['idProyecto']
@@ -77,12 +77,6 @@ def crear_nodos_investigadores(tx, id, nombre_completo, titulo_academico, instit
     )
     tx.run(query, id=id, nombre_completo=nombre_completo, titulo_academico=titulo_academico, institucion=institucion, email=email)
 
-def crear_nodos_investigadoresProy(tx, idInv, idProy):
-    query = (
-        "CREATE (ip:InvestigadorProyecto {idInv: $idInv, idProy: $idProy})"
-    )
-    tx.run(query, idInv=idInv, idProy=idProy)
-
 def crear_nodos_proyectos(tx, idPry, titulo_proyecto, anno_inicio, duracion_meses, area_conocimiento):
     query = (
         "CREATE (pr:Proyecto {idPry: $idPry, titulo_proyecto: $titulo_proyecto, anno_inicio: $anno_inicio, duracion_meses: $duracion_meses, area_conocimiento: $area_conocimiento})"
@@ -95,9 +89,19 @@ def crear_nodos_publicaciones(tx, idPub, titulo_publicacion, anno_publicacion, n
     )
     tx.run(query, idPub=idPub, titulo_publicacion=titulo_publicacion, anno_publicacion=anno_publicacion, nombre_revista=nombre_revista)
 
+def crear_nodos_investigadoresProy(tx, idInv, idProy):
+    query = (
+        "MATCH (in:Investigador), (pr:Proyecto) "
+        "WHERE in.id = $idInv AND pr.idPry = $idProy "
+        "CREATE (in)-[:AFILIADO_A]->(pr)"
+    )
+    tx.run(query, idInv=idInv, idProy=idProy)
+
 def crear_nodos_publicacionesProy(tx, idProyecto, idArt):
     query = (
-        "CREATE (pp:PublicacionProyecto {idProyecto: $idProyecto, idArt: $idArt})"
+        "MATCH (pu:Publicacion), (pr:Proyecto) "
+        "WHERE pu.idPub = $idArt AND pr.idPry=$idProyecto "
+        "CREATE (pu)-[:RELACIONADO_A]->(pr)"
     )
     tx.run(query, idProyecto=idProyecto, idArt=idArt)
 
