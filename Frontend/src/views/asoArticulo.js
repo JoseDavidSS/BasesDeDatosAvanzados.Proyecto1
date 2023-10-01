@@ -1,9 +1,11 @@
 import React, { useState,useEffect } from "react";
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
+import axios from "axios";
 
 function User() {
-  const ids = ["A1", "A2", "A3"];
-  const proy = ["P1", "P2", "P3", "P4", "P5", "P6"];
+  const [art, setArt] = useState([]); 
+  const [proy, setProy] = useState([]); 
+  //let proy = ["P1", "P2", "P3", "P4", "P5", "P6"];
 
   const [logicaId, setlogicaId] = useState(null); // State to track the selected ID
   const [selectedProjects, setSelectedProjects] = useState([]); // State to track selected projects
@@ -12,9 +14,9 @@ function User() {
     setlogicaId(id === logicaId ? null : id);
   };
 
-  useEffect(() => {
-    console.log("logicaID:", logicaId);
-  }, [logicaId]);
+  useEffect(async() => {
+    await handleObtenerArticulosProyectos();
+  }, []);
 
   const handleProjectClick = (project) => {
     if (selectedProjects.includes(project)) {
@@ -24,6 +26,46 @@ function User() {
       // Mete el proyecto a la lista
       setSelectedProjects([...selectedProjects, project]);
     }
+  };
+
+  const handleObtenerArticulosProyectos = async() => {
+    // Realiza una solicitud GET al backend para obtener datos
+    axios.get("http://localhost:8080/admin/AsociarArtículo")
+      .then(response => {
+        // En este punto, `response.data` contiene los datos recibidos del backend
+        console.log("Datos recibidos del backend con éxito:", response.data);
+
+        let indiceArt = 0
+        let indiceProy = 0
+        // Itera sobre los objetos en response para extraer los títulos
+        for (const item of response.data) {
+          console.log("Item 0:", item[0]);
+
+          for (let i = 0; i < item.length; i++) {
+            //console.log("Largooooo:", i);
+
+            if (item[indiceArt].tituloPu) {
+              //console.log("Item Publicacion:", item[indiceArt].tituloPu);
+              art.push(item[indiceArt].tituloPu); // Agrega el título del artículo a la lista art 
+              indiceArt += 1;
+            }
+
+            else {
+              //console.log("Item Proyecto:", item[indiceProy].tituloPr);
+              proy.push(item[indiceProy].tituloPr); // Agrega el título del proyecto a la lista proy
+              indiceProy += 1;
+            }
+          }
+        }
+        
+        indiceArt = 0
+        indiceProy = 0
+        console.log("Articulos:", art);
+        console.log("Proyectos:", proy);
+      })
+      .catch(error => {
+        console.error('Error al obtener datos del backend:', error);
+      });
   };
 
   return (
@@ -42,7 +84,7 @@ function User() {
                       <Form.Group>
                         <Form.Label>IDs</Form.Label>
                         <div className="button-list">
-                          {ids.map((id, index) => (
+                          {art.map((id, index) => (
                             <Button
                               key={index}
                               variant={id === logicaId ? "success" : "info"}

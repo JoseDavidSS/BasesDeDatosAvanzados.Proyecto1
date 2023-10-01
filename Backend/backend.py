@@ -446,6 +446,32 @@ def modificar_articulo_revista(tx, id, dato):
     tx.run(query, id=id, dato=dato)
     print("articulo modificado")
 
+@app.route('/admin/AsociarArtículo', methods=['GET'])
+def obtener_articulos_proyectos():
+
+    with driver.session() as session:
+        articulos= session.read_transaction(obtener_todos_articulos)
+        proyectos = session.read_transaction(obtener_todos_proyectos)
+    return jsonify(articulos, proyectos)
+
+def obtener_todos_articulos(tx):
+    query = (
+        "MATCH (pu:Publicacion) "
+        "RETURN pu.idPub AS idPu, pu.titulo_publicacion AS tituloPu"
+    )
+    result = tx.run(query)
+    articulos = [dict(record) for record in result]
+    return articulos
+
+def obtener_todos_proyectos(tx):
+    query = (
+        "MATCH (pr:Proyecto) "
+        #"RETURN pr.idPry AS id, pr.titulo_proyecto AS titulo, pr.anno_inicio AS anno, pr.duracion_meses AS duracion, pr.area_conocimiento AS area"
+        "RETURN pr.idPry AS idPr, pr.titulo_proyecto AS tituloPr"
+    )
+    result = tx.run(query)
+    proyectos = [dict(record) for record in result]
+    return proyectos
 
 if __name__ == '__main__':
     app.run(port=8080)
