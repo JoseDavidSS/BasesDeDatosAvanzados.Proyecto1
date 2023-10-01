@@ -29,7 +29,8 @@ function TableList() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Get
   const [TopAreasConocimiento, setTopAreasConocimiento] = useState([]);
-
+  const [TopInstituciones, setTopInstituciones] = useState([]);
+  const [TopInvestigadores, setTopInvestigadores] = useState([]);
   const handleProyectoClick = (proyecto) => {
     if (BuscarNombrePublicacion.includes(proyecto)) {
       // Si el proyecto ya está seleccionado, quítalo de la lista
@@ -52,8 +53,16 @@ function TableList() {
       if (tipoConsulta === "1") {
         console.log("Resultados almacenados en la lista:", response.data.resultados);
         setTopAreasConocimiento(response.data.resultados);
-      } else {
-        setTopAreasConocimiento([]);
+      }if(tipoConsulta === "2"){
+        console.log("Resultados almacenados en la lista:", response.data.resultados);
+        setTopInstituciones(response.data.resultados);
+      }if(tipoConsulta === "3"){
+        console.log("Resultados almacenados en la lista:", response.data.resultados);
+        setTopInvestigadores(response.data.resultados);
+      }else {
+        //setTopInstituciones([]);
+        //setTopAreasConocimiento([]);
+        //setTopInvestigadores([]);
       }
     })
     .catch(error => {
@@ -214,26 +223,12 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>TEC</td>
-                      <td>5</td>
-                    </tr>
-                    <tr>
-                      <td>UCR</td>
-                      <td>3</td>
-                    </tr>
-                    <tr>
-                      <td>UNA</td>
-                      <td>2</td>
-                    </tr>
-                    <tr>
-                      <td>CARD</td>
-                      <td>1</td>
-                    </tr>
-                    <tr>
-                      <td>UL</td>
-                      <td>1</td>
-                    </tr>
+                    {TopInstituciones.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.institucion}</td>
+                        <td>{item.num_proyectos}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
@@ -258,31 +253,13 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Aldo</td>
-                      <td>TEC</td>
-                      <td>5</td>
-                    </tr>
-                    <tr>
-                      <td>Aldo</td>
-                      <td>UCR</td>
-                      <td>3</td>
-                    </tr>
-                    <tr>
-                      <td>Aldo</td>
-                      <td>UNA</td>
-                      <td>2</td>
-                    </tr>
-                    <tr>
-                      <td>Aldo</td>
-                      <td>CARD</td>
-                      <td>1</td>
-                    </tr>
-                    <tr>
-                      <td>Aldo</td>
-                      <td>UL</td>
-                      <td>1</td>
-                    </tr>
+                    {TopInvestigadores.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.nombre_completo}</td>
+                        <td>{item.institucion}</td>
+                        <td>{item.num_proyectos}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>

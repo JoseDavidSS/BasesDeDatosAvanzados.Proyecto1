@@ -530,6 +530,31 @@ def obtener_T5_AreasConocimiento(tx):
     result = tx.run(query)
     areas_conocimiento = [dict(record) for record in result]
     return areas_conocimiento
+
+def obtener_T5_Instituciones(tx):
+    query = (
+        "MATCH (i:Investigador)-[:AFILIADO_A]->(p:Proyecto) "
+        "WITH i.institucion AS institucion, COUNT(p) AS num_proyectos "
+        "ORDER BY num_proyectos DESC "
+        "LIMIT 5 "
+        "RETURN institucion, num_proyectos"
+    )
+    result = tx.run(query)
+    instituciones = [dict(record) for record in result]
+    return instituciones
+def obtener_T5_Investigadores(tx):
+    query = (
+        "MATCH (i:Investigador)-[:AFILIADO_A]->(p:Proyecto) "
+        "WITH i.nombre_completo AS nombre_completo, i.institucion AS institucion, COUNT(p) AS num_proyectos "
+        "ORDER BY num_proyectos DESC "
+        "LIMIT 5 "
+        "RETURN nombre_completo, institucion, num_proyectos"
+    )
+    result = tx.run(query)
+    investigadores = [dict(record) for record in result]
+    return investigadores
+
+
 @app.route('/admin/Consultas', methods=['POST'])
 def mantenimiento_publicaciones():
     try:
@@ -537,14 +562,18 @@ def mantenimiento_publicaciones():
         if tipo_consulta == 1:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
                 resultados = session.write_transaction(obtener_T5_AreasConocimiento)
-        
-        print("tipoConsulta: ", tipo_consulta)
+        if tipo_consulta == 2:
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_T5_Instituciones)
+        if tipo_consulta == 3:
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_T5_Investigadores)
+        print("tipoConsulta: ", resultados)
         # Prepara la respuesta como un objeto JSON y envíala
         return jsonify({"resultados": resultados})
     
     except Exception as e:
         return jsonify({"error": str(e)})
-
 
 @app.route('/admin/AsociarInvestigador', methods=['POST'])
 def asociar_investigadores_proyectos():
