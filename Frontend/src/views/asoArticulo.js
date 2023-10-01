@@ -51,6 +51,22 @@ function User() {
     });
   };
   
+  const handleAsociarPublicacionProyecto = () => {
+    console.log("Artículo:", logicaId);
+    console.log("Proyecto:", selectedProjects);
+
+    // Aquí, envía los datos al backend Flask utilizando Axios
+    axios.post("http://localhost:8080/admin/AsociarArtículo?", {
+      logicaId,
+      selectedProjects
+    })
+    .then(response => {
+      console.log("Datos enviados al backend con éxito:", response.data);
+    })
+    .catch(error => {
+      console.error('Error al enviar datos al backend:', error);
+    });
+  };
 
   return (
     <>
@@ -109,8 +125,8 @@ function User() {
                   <Row className="justify-content-center">
                     <Button
                       className="btn-fill pull-right"
-                      type="submit"
                       variant="info"
+                      onClick={handleAsociarPublicacionProyecto}
                     >
                       Asociar
                     </Button>
