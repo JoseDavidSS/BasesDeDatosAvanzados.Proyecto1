@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import axios from "axios";
 // react-bootstrap components
 import {
   Badge,
@@ -15,17 +15,20 @@ import {
 } from "react-bootstrap";
 
 function TableList() {
-  
+  //Post  
   const AreaConocimiento = ["Ciencias Ambientales", "Informática", "Nanociencia"];
   const NombreInv = ["Aldo", "David", "Olga"];
-  const NombreProyecto =["Proyecto 1", "Proyecto 2", "Proyecto 3", "Proyecto 4"]; // Ejemplo de datos
+  const NombreProyecto =["Proyecto 1", "Proyecto 2", "Proyecto 3", "Proyecto 4"]; 
   const NombrePublicaciones =["Publicación 1", "Publicación 2", "Publicación 3", "Publicación 4"];
   const [BuscarColega, setBuscarColega] = useState("");
   const [BuscarAreaConocimiento, setBuscarAreaConocimiento] = useState("");
   const [BuscarNombrePublicacion, setBuscarNombrePublicacion] = useState([]);
   const [BuscarNombreProyecto, setBuscarNombreProyecto] = useState("");
   const [BuscarNombreInvestigador, setBuscarNombreInvestigador] = useState("");
-  const [tipoConsulta, setTipoConsulta] = useState('1'); // Valor inicial, puedes cambiarlo según tus necesidades
+  const [tipoConsulta, setTipoConsulta] = useState('1');
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //Get
+  const [TopAreasConocimiento, setTopAreasConocimiento] = useState([]);
 
   const handleProyectoClick = (proyecto) => {
     if (BuscarNombrePublicacion.includes(proyecto)) {
@@ -40,6 +43,23 @@ function TableList() {
     console.log('Valor seleccionado:', tipoConsulta);
   }, [tipoConsulta]);
 
+  const handleBuscarConsulta = () => {
+    // Aquí, envía los datos al backend Flask utilizando Axios
+    axios.post("http://localhost:8080/admin/Consultas", {
+      tipoConsulta
+    })
+    .then(response => {
+      if (tipoConsulta === "1") {
+        console.log("Resultados almacenados en la lista:", response.data.resultados);
+        setTopAreasConocimiento(response.data.resultados);
+      } else {
+        setTopAreasConocimiento([]);
+      }
+    })
+    .catch(error => {
+      console.error('Error al enviar datos al backend:', error);
+    });
+  };
   return (
     <>
       <Container fluid>
@@ -60,7 +80,7 @@ function TableList() {
             </Form.Group>
           </Col>
           <Col md="6" className="d-flex align-items-end justify-content-start">
-            <Button className="btn-fill" variant="info"> Buscar</Button>
+            <Button className="btn-fill" variant="info"  onClick={handleBuscarConsulta}> Buscar</Button>
           </Col>
           {(tipoConsulta === "4") &&(
             <Col md="6" className="d-flex align-items-end justify-content-start">
@@ -165,26 +185,12 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Mate</td>
-                      <td>5</td>
-                    </tr>
-                    <tr>
-                      <td>Biologia</td>
-                      <td>3</td>
-                    </tr>
-                    <tr>
-                      <td>Física</td>
-                      <td>2</td>
-                    </tr>
-                    <tr>
-                      <td>Letras</td>
-                      <td>1</td>
-                    </tr>
-                    <tr>
-                      <td>Quimica</td>
-                      <td>1</td>
-                    </tr>
+                    {TopAreasConocimiento.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.area}</td>
+                        <td>{item.contador}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>

@@ -519,6 +519,32 @@ def obtener_todos_proyectos(tx):
     result = tx.run(query)
     proyectos = [dict(record) for record in result]
     return proyectos
+def obtener_T5_AreasConocimiento(tx):
+    query = (
+        "MATCH (p:Proyecto) "
+        "WITH p.area_conocimiento AS area, COUNT(p) AS contador "
+        "ORDER BY contador DESC "
+        "LIMIT 5 "
+        "RETURN area, contador"
+    )
+    result = tx.run(query)
+    areas_conocimiento = [dict(record) for record in result]
+    return areas_conocimiento
+@app.route('/admin/Consultas', methods=['POST'])
+def mantenimiento_publicaciones():
+    try:
+        tipo_consulta = int(request.json.get('tipoConsulta'))
+        if tipo_consulta == 1:
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_T5_AreasConocimiento)
+        
+        print("tipoConsulta: ", tipo_consulta)
+        # Prepara la respuesta como un objeto JSON y envíala
+        return jsonify({"resultados": resultados})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
 
 @app.route('/admin/AsociarInvestigador', methods=['POST'])
 def asociar_investigadores_proyectos():
