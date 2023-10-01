@@ -89,6 +89,10 @@ function User() {
                     </Button>
                   </Row>
                   <div>
+                    <h4>ID Seleccionado:</h4>
+                    <p>{logicaInv}</p>
+                  </div>
+                  <div>
                     <h4>Proyectos Seleccionados:</h4>
                     <ul>
                       {selectedProjects.map((project, index) => (
