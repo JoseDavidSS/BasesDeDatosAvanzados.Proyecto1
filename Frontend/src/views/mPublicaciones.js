@@ -203,7 +203,6 @@ function User() {
                   <br /> {/* Salto de línea */}
                   <Button
                     className="btn-fill pull-right"
-                    type="submit"
                     variant="info"
                     onClick={handleCrearPublicaciones}
                   >
@@ -304,7 +303,6 @@ function User() {
                   <br /> {/* Salto de línea */}
                   <Button
                     className="btn-fill pull-right"
-                    type="submit"
                     variant="info"
                     onClick={handleModificarPublicaciones}
                   >
