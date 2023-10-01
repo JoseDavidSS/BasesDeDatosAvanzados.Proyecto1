@@ -473,7 +473,7 @@ def asociar_art_proy(tx, titulo_pub, titulo_proy):
     query = (
         "MATCH (pu:Publicacion), (pr:Proyecto) "
         "WHERE pu.titulo_publicacion = $titulo_pub AND pr.titulo_proyecto = $titulo_proy "
-        "CREATE (pu)-[:RELACIONADO_A]->(pr)"
+        "MERGE (pu)-[:RELACIONADO_A]->(pr)"
     )
     tx.run(query, titulo_pub=titulo_pub, titulo_proy=titulo_proy)
     print("Articulo asociado a proyecto")
@@ -520,6 +520,39 @@ def obtener_todos_proyectos(tx):
     proyectos = [dict(record) for record in result]
     return proyectos
 
+@app.route('/admin/AsociarInvestigador', methods=['POST'])
+def asociar_investigadores_proyectos():
+    try:
 
+        dato_nombre_investigador = request.json.get('logicaInv')
+        dato_nombre_proyecto = request.json.get('selectedProjects')
+
+        print("Investigador: ", dato_nombre_investigador)
+        print("Proyecto: ", dato_nombre_proyecto)
+
+        print(type(dato_nombre_investigador))
+        print(type(dato_nombre_proyecto))
+        print(type(dato_nombre_proyecto[0]))
+
+        for proyecto in dato_nombre_proyecto:
+            with driver.session() as session:
+                session.write_transaction(asociar_inv_proy, dato_nombre_investigador, proyecto)
+
+        print("Investigador asociado a proyecto con éxito.")
+
+        return jsonify({"message": "Datos asociados correctamente."})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+def asociar_inv_proy(tx, nombre_inv, titulo_proy):
+    query = (
+        "MATCH (in:Investigador), (pr:Proyecto) "
+        "WHERE in.nombre_completo = $nombre_inv AND pr.titulo_proyecto = $titulo_proy "
+        "MERGE (in)-[:AFILIADO_A]->(pr)"
+    )
+    tx.run(query, nombre_inv=nombre_inv, titulo_proy=titulo_proy)
+    print("Investigador asociado a proyecto")
+    
 if __name__ == '__main__':
     app.run(port=8080)
