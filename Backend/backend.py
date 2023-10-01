@@ -554,11 +554,38 @@ def obtener_T5_Investigadores(tx):
     investigadores = [dict(record) for record in result]
     return investigadores
 
+def obtener_InfoInv_Proyectos(tx, id):
+    query_investigador = (
+        f"MATCH (i:Investigador {{id: '{id}'}}) "
+        "RETURN i.nombre_completo AS nombreCompleto, i.institucion AS institucion, i.titulo_academico AS tituloAcademico, i.email AS email;"
+    )
+    result_investigador = tx.run(query_investigador)
+    info_investigador = [dict(record) for record in result_investigador]
+
+    query_proyectos = (
+        f"MATCH (i:Investigador {{id: '{id}'}})-[:AFILIADO_A]->(p:Proyecto) "
+        "RETURN p.anno_inicio AS annoInicio, p.area_conocimiento AS areaConocimiento, "
+        "p.duracion_meses AS duracionMeses, p.idPry AS idProyecto, p.titulo_proyecto AS tituloProyecto;"
+    )
+    result_proyectos = tx.run(query_proyectos)
+    proyectos_afiliados = [dict(record) for record in result_proyectos]
+    
+    return {"investigador": info_investigador, "proyectos_afiliados": proyectos_afiliados}
+
+
+
+@app.route('/admin/Consultas', methods=['GET'])
+def obtener_nombreInv():
+    with driver.session() as session:
+        inv = session.read_transaction(obtener_todos_investiadores)
+    return jsonify(inv)
 
 @app.route('/admin/Consultas', methods=['POST'])
-def mantenimiento_publicaciones():
+def tipoConsultas():
     try:
         tipo_consulta = int(request.json.get('tipoConsulta'))
+        BuscarNombreInvestigadorID = request.json.get('BuscarNombreInvestigadorID')
+        
         if tipo_consulta == 1:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
                 resultados = session.write_transaction(obtener_T5_AreasConocimiento)
@@ -568,6 +595,10 @@ def mantenimiento_publicaciones():
         if tipo_consulta == 3:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
                 resultados = session.write_transaction(obtener_T5_Investigadores)
+        if tipo_consulta == 4:
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_InfoInv_Proyectos, BuscarNombreInvestigadorID)
+        
         print("tipoConsulta: ", resultados)
         # Prepara la respuesta como un objeto JSON y envíala
         return jsonify({"resultados": resultados})

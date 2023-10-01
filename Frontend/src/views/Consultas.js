@@ -17,20 +17,27 @@ import {
 function TableList() {
   //Post  
   const AreaConocimiento = ["Ciencias Ambientales", "Informática", "Nanociencia"];
-  const NombreInv = ["Aldo", "David", "Olga"];
   const NombreProyecto =["Proyecto 1", "Proyecto 2", "Proyecto 3", "Proyecto 4"]; 
   const NombrePublicaciones =["Publicación 1", "Publicación 2", "Publicación 3", "Publicación 4"];
+  
+  //Busqueda de un(a) investigador(a)
+  const [NombreInv, setNombreInv] = useState([]);
+  const [BuscarNombreInvestigadorID, setBuscarNombreInvestigadorID] = useState("");
+  const [infoInv, setinfoInv] = useState([]);
+  const [infoProyectosInv, setinfoProyectosInv] = useState([]);
+  
+
   const [BuscarColega, setBuscarColega] = useState("");
   const [BuscarAreaConocimiento, setBuscarAreaConocimiento] = useState("");
   const [BuscarNombrePublicacion, setBuscarNombrePublicacion] = useState([]);
   const [BuscarNombreProyecto, setBuscarNombreProyecto] = useState("");
-  const [BuscarNombreInvestigador, setBuscarNombreInvestigador] = useState("");
   const [tipoConsulta, setTipoConsulta] = useState('1');
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Get
   const [TopAreasConocimiento, setTopAreasConocimiento] = useState([]);
   const [TopInstituciones, setTopInstituciones] = useState([]);
   const [TopInvestigadores, setTopInvestigadores] = useState([]);
+  
   const handleProyectoClick = (proyecto) => {
     if (BuscarNombrePublicacion.includes(proyecto)) {
       // Si el proyecto ya está seleccionado, quítalo de la lista
@@ -40,30 +47,65 @@ function TableList() {
       setBuscarNombrePublicacion([...BuscarNombrePublicacion, proyecto]);
     }
   };
+  ///////////////////////// Busqueda de un(a) investigador(a)
+  const handleNombreInvestigadorChange = (e) => {
+    setBuscarNombreInvestigadorID(e.target.value);
+  };
+  const handleObtenerInv = () => {
+    // Realiza una solicitud GET al backend para obtener datos
+    axios.get("http://localhost:8080/admin/Consultas")
+    .then(response => {
+      // En este punto, `response.data` contiene los datos recibidos del backend
+      const nombres = response.data.map(({nombreC,idInv}) => ({
+        nombreC,
+        idInv
+      }));
+      setNombreInv(nombres)
+    })
+    .catch(error => {
+      console.error('Error al obtener datos del backend:', error);
+    });
+  };
+  /////////////////////////
+  
+  
   useEffect(() => {
     console.log('Valor seleccionado:', tipoConsulta);
+
+    if (tipoConsulta === "4") {
+      handleObtenerInv();
+    }if(tipoConsulta === "5"){
+      //
+    }if(tipoConsulta === "6"){
+      //
+    }if(tipoConsulta === "7"){
+      //
+    }
+    else {
+      handleObtenerInv();
+    }
   }, [tipoConsulta]);
 
   const handleBuscarConsulta = () => {
     // Aquí, envía los datos al backend Flask utilizando Axios
     axios.post("http://localhost:8080/admin/Consultas", {
-      tipoConsulta
+      tipoConsulta,
+      BuscarNombreInvestigadorID
     })
     .then(response => {
       if (tipoConsulta === "1") {
-        console.log("Resultados almacenados en la lista:", response.data.resultados);
         setTopAreasConocimiento(response.data.resultados);
       }if(tipoConsulta === "2"){
-        console.log("Resultados almacenados en la lista:", response.data.resultados);
         setTopInstituciones(response.data.resultados);
       }if(tipoConsulta === "3"){
-        console.log("Resultados almacenados en la lista:", response.data.resultados);
         setTopInvestigadores(response.data.resultados);
+      }if(tipoConsulta === "4"){
+        const { investigador, proyectos_afiliados } = response.data.resultados;
+        setinfoInv(investigador);
+        setinfoProyectosInv(proyectos_afiliados);
       }else {
-        //setTopInstituciones([]);
-        //setTopAreasConocimiento([]);
-        //setTopInvestigadores([]);
       }
+      console.log("Resultados almacenados en la lista:", response.data.resultados);
     })
     .catch(error => {
       console.error('Error al enviar datos al backend:', error);
@@ -96,15 +138,17 @@ function TableList() {
               <Form.Group>
               <br /> {/* Salto de línea */}
                 <Form.Label>Investigadores(as)</Form.Label>
-                  <Form.Control as="select"
-                    value={BuscarNombreInvestigador} 
-                    onChange={(e) => setBuscarNombreInvestigador(e.target.value)}> 
-                    {NombreInv.map((BuscarNombreInvestigador) => (
-                    <option key={BuscarNombreInvestigador} value={BuscarNombreInvestigador}>
-                        {BuscarNombreInvestigador}
+                <Form.Control
+                  as="select"
+                  value={BuscarNombreInvestigadorID}
+                  onChange={handleNombreInvestigadorChange}
+                >
+                  {NombreInv.map(({ nombreC, idInv }) => (
+                    <option key={idInv} value={idInv}>
+                      {nombreC}
                     </option>
-                    ))}
-                  </Form.Control>
+                  ))}
+                </Form.Control>
               </Form.Group>
             </Col>
           )}
@@ -164,13 +208,15 @@ function TableList() {
               <Form.Group>
               <br /> {/* Salto de línea */}
                 <Form.Label>Colegas</Form.Label>
-                  <Form.Control as="select"
-                    value={BuscarColega} 
-                    onChange={(e) => setBuscarColega(e.target.value)}> 
-                    {NombreInv.map((BuscarColega) => (
-                    <option key={BuscarColega} value={BuscarColega}>
-                        {BuscarColega}
-                    </option>
+                  <Form.Control
+                    as="select"
+                    value={BuscarNombreInvestigadorID}
+                    onChange={handleNombreInvestigadorChange}
+                  >
+                    {NombreInv.map(({ nombreC, idInv }) => (
+                      <option key={idInv} value={idInv}>
+                        {nombreC}
+                      </option>
                     ))}
                   </Form.Control>
               </Form.Group>
@@ -285,13 +331,15 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>5</td>
-                      <td>Aldo Cambronero Ureña</td>
-                      <td>PhD</td>
-                      <td>TEC</td>
-                      <td>Cambroneroaldo@gmail.com</td>
-                    </tr>
+                    {infoInv.map((item, index) => (
+                      <tr key={index}>
+                        <td>{BuscarNombreInvestigadorID}</td>
+                        <td>{item.nombreCompleto}</td>
+                        <td>{item.tituloAcademico}</td>
+                        <td>{item.institucion}</td>
+                        <td>{item.email}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
@@ -312,9 +360,15 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-
-                    </tr>
+                    {infoProyectosInv.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.idProyecto}</td>
+                        <td>{item.tituloProyecto}</td>
+                        <td>{item.annoInicio}</td>
+                        <td>{item.duracionMeses}</td>
+                        <td>{item.areaConocimiento}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
