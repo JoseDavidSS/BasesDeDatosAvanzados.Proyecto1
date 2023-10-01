@@ -448,11 +448,26 @@ def modificar_articulo_revista(tx, id, dato):
 
 @app.route('/admin/AsociarArtículo', methods=['GET'])
 def obtener_articulos_proyectos():
-
     with driver.session() as session:
         articulos= session.read_transaction(obtener_todos_articulos)
         proyectos = session.read_transaction(obtener_todos_proyectos)
     return jsonify(articulos, proyectos)
+
+@app.route('/admin/AsociarInvestigador', methods=['GET'])
+def obtener_investigadores_proyectos():
+    with driver.session() as session:
+        inv = session.read_transaction(obtener_todos_investiadores)
+        proyectos = session.read_transaction(obtener_todos_proyectos)
+    return jsonify(inv, proyectos)
+
+def obtener_todos_investiadores(tx):
+    query = (
+        "MATCH (inv:Investigador) "
+        "RETURN inv.id AS idInv, inv.email AS email, inv.institucion AS institucion, inv.nombre_completo AS nombreC, inv.titulo_academico AS tituloAc"
+    )
+    result = tx.run(query)
+    inv = [dict(record) for record in result]
+    return inv
 
 def obtener_todos_articulos(tx):
     query = (

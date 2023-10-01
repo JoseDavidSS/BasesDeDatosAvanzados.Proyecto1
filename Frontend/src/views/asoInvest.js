@@ -1,20 +1,17 @@
 import React, { useState,useEffect } from "react";
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
-
+import axios from "axios";
 function User() {
-  const inv = ["Aldo", "Jose", "Vale"];
-  const proy = ["P1", "P2", "P3","P4", "P5", "P6"];  
   
+  const [inv, setInv] = useState([]); 
+  const [proy, setProy] = useState([]); 
+
   const [logicaInv, setlogicaInv] = useState(null); // State to track the selected ID
   const [selectedProjects, setSelectedProjects] = useState([]); // State to track selected projects
 
   const handleIdClick = (id) => {
     setlogicaInv(id === logicaInv ? null : id);
   };
-  useEffect(() => {
-    console.log("logicaID:", logicaInv);
-  }, [logicaInv]);
-
   const handleProjectClick = (project) => {
     if (selectedProjects.includes(project)) {
       // Deselecciona un proyecto
@@ -23,6 +20,32 @@ function User() {
       // Mete el proyecto a la lista
       setSelectedProjects([...selectedProjects, project]);
     }
+  };
+
+  useEffect(() => {
+    // Esta función se ejecutará cuando el componente se monte
+    handleObtenerArticulosProyectos();
+  }, []); // El array vacío como segundo argumento significa que se ejecutará solo una vez
+
+  const handleObtenerArticulosProyectos = () => {
+    // Realiza una solicitud GET al backend para obtener datos
+    axios.get("http://localhost:8080/admin/AsociarInvestigador")
+    .then(response => {
+      // En este punto, `response.data` contiene los datos recibidos del backend
+      console.log("Datos recibidos del backend con éxito:", response.data);
+      // Suponiendo que response.data es un array con dos sub-arrays
+      const [investigadora, proyectos] = response.data;
+
+      // Extraer solo los valores de 'tituloPu' y 'tituloPr' y actualizar los estados
+      const titulosInv = investigadora.map(articulo => articulo.nombreC);
+      const titulosProy = proyectos.map(proyecto => proyecto.tituloPr);
+      setInv(titulosInv);
+      setProy(titulosProy);
+
+    })
+    .catch(error => {
+      console.error('Error al obtener datos del backend:', error);
+    });
   };
 
   return (
@@ -89,7 +112,7 @@ function User() {
                     </Button>
                   </Row>
                   <div>
-                    <h4>ID Seleccionado:</h4>
+                    <h4>Nombre de la investigador(a):</h4>
                     <p>{logicaInv}</p>
                   </div>
                   <div>
