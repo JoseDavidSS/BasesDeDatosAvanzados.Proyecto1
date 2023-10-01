@@ -446,6 +446,38 @@ def modificar_articulo_revista(tx, id, dato):
     tx.run(query, id=id, dato=dato)
     print("articulo modificado")
 
+@app.route('/admin/AsociarArtículo', methods=['POST'])
+def asociar_articulos_proyectos():
+    try:
+
+        dato_nombre_publicacion = request.json.get('logicaId')
+        dato_nombre_proyecto = request.json.get('selectedProjects')
+
+        print("Publicación: ", dato_nombre_publicacion)
+        print("Proyecto: ", dato_nombre_proyecto)
+
+        print(type(dato_nombre_publicacion))
+        print(type(dato_nombre_proyecto[0]))
+
+        with driver.session() as session:
+            session.write_transaction(asociar_art_proy, dato_nombre_publicacion, dato_nombre_proyecto[0])
+
+        print("Publicacion asociada a poryecto con éxito.")
+
+        return jsonify({"message": "Datos asociados correctamente."})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+def asociar_art_proy(tx, titulo_pub, titulo_proy):
+    query = (
+        "MATCH (pu:Publicacion), (pr:Proyecto) "
+        "WHERE pu.titulo_publicacion = $titulo_pub AND pr.titulo_proyecto = $titulo_proy "
+        "CREATE (pu)-[:RELACIONADO_A]->(pr)"
+    )
+    tx.run(query, titulo_pub=titulo_pub, titulo_proy=titulo_proy)
+    print("Articulo asociado a proyecto")
+
 @app.route('/admin/AsociarArtículo', methods=['GET'])
 def obtener_articulos_proyectos():
     with driver.session() as session:
@@ -488,37 +520,6 @@ def obtener_todos_proyectos(tx):
     proyectos = [dict(record) for record in result]
     return proyectos
 
-@app.route('/admin/AsociarArtículo', methods=['POST'])
-def asociar_articulos_proyectos():
-    try:
-
-        dato_nombre_publicacion = request.json.get('logicaId')
-        dato_nombre_proyecto = request.json.get('selectedProjects')
-
-        print("Publicación: ", dato_nombre_publicacion)
-        print("Proyecto: ", dato_nombre_proyecto)
-
-        print(type(dato_nombre_publicacion))
-        print(type(dato_nombre_proyecto[0]))
-
-        with driver.session() as session:
-            session.write_transaction(asociar_art_proy, dato_nombre_publicacion, dato_nombre_proyecto[0])
-
-        print("Publicacion asociada a poryecto con éxito.")
-
-        return jsonify({"message": "Datos asociados correctamente."})
-    
-    except Exception as e:
-        return jsonify({"error": str(e)})
-
-def asociar_art_proy(tx, titulo_pub, titulo_proy):
-    query = (
-        "MATCH (pu:Publicacion), (pr:Proyecto) "
-        "WHERE pu.titulo_publicacion = $titulo_pub AND pr.titulo_proyecto = $titulo_proy "
-        "CREATE (pu)-[:RELACIONADO_A]->(pr)"
-    )
-    tx.run(query, titulo_pub=titulo_pub, titulo_proy=titulo_proy)
-    print("Articulo asociado a proyecto")
 
 if __name__ == '__main__':
     app.run(port=8080)
