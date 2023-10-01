@@ -234,7 +234,7 @@ datoCrearTituloAcademico = []
 datoCrearInstitucion = []
 datoCrearCorreo = []
 datoModificacionSeleccionada = []
-@app.route('/admin/MantenimientoProyectos', methods=['POST', 'OPTIONS'])
+@app.route('/admin/MantenimientoProyectos', methods=['POST'])
 def crear_modificar_proyectos():
     print("se va a modificar o crear un proyecto...")
     try:
@@ -262,6 +262,8 @@ def crear_modificar_proyectos():
 
             with driver.session() as session:
                 session.write_transaction(crear_nodos_proyectos, dato_crearId, dato_crearTituloProyecto, dato_crearAnnoProyecto, dato_crearDuracionProyecto, dato_crearAreaProyecto)
+
+            session.close()
 
             print("Proyecto creado con éxito.")
 
@@ -304,6 +306,8 @@ def crear_modificar_proyectos():
                 print('Año de proyecto: ' + dato_modificarAnnoProyecto)
                 with driver.session() as session:
                     session.write_transaction(modificar_proyecto_anno, dato_id, dato_modificarAnnoProyecto)
+
+            session.close()
 
             print("Proyecto modificado con éxito.")
 

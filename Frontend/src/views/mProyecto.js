@@ -141,9 +141,6 @@ function User() {
   const handleModificationChange = (e) => {
       setSelectedModification(e.target.value); // Actualizar el año seleccionado
   };
-  useEffect(() => {
-    console.log('Valor seleccionado:', selectedModification);
-  }, [selectedModification]);
   
   return (
     <>
@@ -225,7 +222,6 @@ function User() {
                   <br /> {/* Salto de línea */}
                   <Button 
                     className="btn-fill pull-right" 
-                    type="submit" 
                     variant="info"
                     onClick={handleCrearProyectos}>
                     Crear proyecto
@@ -334,8 +330,7 @@ function User() {
                   )}
                   <br /> {/* Salto de línea */}
                   <Button 
-                    className="btn-fill pull-right" 
-                    type="submit" 
+                    className="btn-fill pull-right"
                     variant="info"
                     onClick={handleModificarProyectos}
                   >
