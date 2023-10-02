@@ -16,10 +16,7 @@ import {
 
 function User() {
   //Aqui hay que hacer un getIDs
-  const ids = [];
-  for (let id = 0; id <= 10; id++) {
-      ids.push(id);
-  }
+  const [ids, setids] = useState([]);
 
   const [crearIdProyecto, setCrearIdProyecto] = useState("");
   const [crearTituloProyecto, setCrearTituloProyecto] = useState("");
@@ -136,6 +133,18 @@ function User() {
       console.error('Error al enviar datos al backend:', error);
     });
   };
+  
+  useEffect(() => {
+    // Realiza una solicitud GET al backend para obtener datos
+    axios.get("http://localhost:8080/admin/MantenimientoProyectos")
+    .then(response => {
+      // En este punto, `response.data` contiene los datos recibidos del backend
+      setids(response.data)
+    })
+    .catch(error => {
+      console.error('Error al obtener datos del backend:', error);
+    });
+  }, []);
 
   const [selectedModification, setSelectedModification] = useState("1"); // El año seleccionado
   const handleModificationChange = (e) => {

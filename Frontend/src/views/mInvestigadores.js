@@ -16,10 +16,7 @@ import {
 
 function User() {
   //Aqui hay que hacer un getIDs
-  const ids = [];
-  for (let id = 0; id <= 10; id++) {
-      ids.push(id);
-  }
+  const [ids, setids] = useState([]);
 
   const [crearIdInvestigador, setCrearIdInvestigador] = useState("");
   const [crearNombreInvestigador, setCrearNombreInvestigador] = useState("");
@@ -159,7 +156,17 @@ function User() {
   };
   useEffect(() => {
     console.log('Valor seleccionado:', selectedModification);
+    // Realiza una solicitud GET al backend para obtener datos
+    axios.get("http://localhost:8080/admin/MantenimientoInvestigadores")
+    .then(response => {
+      // En este punto, `response.data` contiene los datos recibidos del backend
+      setids(response.data)
+    })
+    .catch(error => {
+      console.error('Error al obtener datos del backend:', error);
+    });
   }, [selectedModification]);
+
   return (
     <>
       <Container fluid>

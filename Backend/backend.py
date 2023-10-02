@@ -666,7 +666,32 @@ def obtener_InfoInv_Colegas(tx, id):
     print(colegas)
     
     return {"investigador": info_investigador, "colegas": colegas}
+def obtener_idPub(tx):
+    query = (
+        "MATCH (p:Publicacion) "
+        "RETURN p.idPub AS idPub;"
+    )
+    result = tx.run(query)
+    todosID = [record["idPub"] for record in result]
 
+    return todosID
+def obtener_idInv(tx):
+    query = (
+        "MATCH (p:Investigador) "
+        "RETURN p.id AS idInv;"
+    )
+    result = tx.run(query)
+    todosID = [record["idInv"] for record in result]
+    return todosID
+
+def obtener_idPry(tx):
+    query = (
+        "MATCH (p:Proyecto) "
+        "RETURN p.idPry AS idPry;"
+    )
+    result = tx.run(query)
+    todosID = [record["idPry"] for record in result]
+    return todosID
 @app.route('/admin/Consultas', methods=['GET'])
 def obtener_DatosConsulta():
     with driver.session() as session:
@@ -675,6 +700,24 @@ def obtener_DatosConsulta():
         art = session.read_transaction(obtener_todos_articulos)
         areaConocimiento = session.read_transaction(obtener_todas_AreasConocimiento)
     return jsonify(inv,proy,art,areaConocimiento)
+
+@app.route('/admin/MantenimientoInvestigadores', methods=['GET'])
+def obtener_ID_Inv():
+    with driver.session() as session:
+        id = session.read_transaction(obtener_idInv)
+    return jsonify(id)
+
+@app.route('/admin/MantenimientoProyectos', methods=['GET'])
+def obtener_ID_Pry():
+    with driver.session() as session:
+        id = session.read_transaction(obtener_idPry)
+    return jsonify(id)
+
+@app.route('/admin/MantenimientoPublicaciones', methods=['GET'])
+def obtener_ID_Publ():
+    with driver.session() as session:
+        id = session.read_transaction(obtener_idPub)
+    return jsonify(id)
 
 def obtener_InfoPublicaciones(tx, listaID):
     publicaciones = []

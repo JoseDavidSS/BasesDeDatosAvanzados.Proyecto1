@@ -25,15 +25,9 @@ function User() {
     for (let year = 1900; year <= currentYear; year++) {
         years.push(year);
     }
-    useEffect(() => {
-      console.log('Valor seleccionado:', selectedYear);
-    }, [selectedYear]);
 
     //Aqui hay que hacer un getIDs
-    const ids = [];
-    for (let id = 0; id <= 10; id++) {
-        ids.push(id);
-    }
+    const [ids, setids] = useState([]);
 
     const [crearIdPublicacion, setCrearIdPublicacion] = useState("");
     const [crearTituloPublicacion, setCrearTituloPublicacion] = useState("");
@@ -130,8 +124,16 @@ function User() {
         setSelectedModification(e.target.value); // Actualizar el año seleccionado
     };
     useEffect(() => {
-      console.log('Valor seleccionado:', selectedModification);
-    }, [selectedModification]);
+      // Realiza una solicitud GET al backend para obtener datos
+      axios.get("http://localhost:8080/admin/MantenimientoPublicaciones")
+      .then(response => {
+        // En este punto, `response.data` contiene los datos recibidos del backend
+        setids(response.data)
+      })
+      .catch(error => {
+        console.error('Error al obtener datos del backend:', error);
+      });
+    }, []);
     return (
     <>
       <Container fluid>

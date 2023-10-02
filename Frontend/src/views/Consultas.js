@@ -50,15 +50,6 @@ function TableList() {
   const [TopInstituciones, setTopInstituciones] = useState([]);
   const [TopInvestigadores, setTopInvestigadores] = useState([]);
   
-  const handleProyectoClick = (proyecto) => {
-    if (BuscarNombrePublicacion.includes(proyecto)) {
-      // Si el proyecto ya está seleccionado, quítalo de la lista
-      setBuscarNombrePublicacion(BuscarNombrePublicacion.filter((p) => p !== proyecto));
-    } else {
-      // Si el proyecto no está seleccionado, agrégalo a la lista
-      setBuscarNombrePublicacion([...BuscarNombrePublicacion, proyecto]);
-    }
-  };
   ///////////////////////// Busqueda de un(a) investigador(a)
   const handleNombreInvestigadorChange = (e) => {
     setBuscarNombreInvestigadorID(e.target.value);
@@ -704,5 +695,4 @@ function TableList() {
     </>
   );
 }
-
 export default TableList;
