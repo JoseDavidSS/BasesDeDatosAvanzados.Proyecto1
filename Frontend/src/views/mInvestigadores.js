@@ -114,9 +114,13 @@ function User() {
     })
     .then(response => {
       console.log("Datos enviados al backend con éxito:", response.data);
+      // Muestra un mensaje de éxito en una ventana emergente
+      alert("Operación realizada con éxito");
     })
     .catch(error => {
       console.error('Error al enviar datos al backend:', error);
+      // Muestra un mensaje de error en una ventana emergente
+      alert("Error al realizar la operación");
     });
   };
 
@@ -144,9 +148,11 @@ function User() {
     })
     .then(response => {
       console.log("Datos enviados al backend con éxito:", response.data);
+      alert("Operación realizada con éxito");
     })
     .catch(error => {
       console.error('Error al enviar datos al backend:', error);
+      alert("Error al realizar la operación");
     });
   };
   
