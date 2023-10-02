@@ -520,6 +520,16 @@ def obtener_todos_proyectos(tx):
     proyectos = [dict(record) for record in result]
     return proyectos
 
+def obtener_todas_AreasConocimiento(tx):
+    query = (
+        "MATCH (n) "
+        "WHERE n.area_conocimiento IS NOT NULL "
+        "RETURN DISTINCT n.area_conocimiento AS area_conocimiento"
+    )
+    result = tx.run(query)
+    areas_conocimiento = [record["area_conocimiento"] for record in result]
+    return areas_conocimiento
+
 def obtener_T5_AreasConocimiento(tx):
     query = (
         "MATCH (p:Proyecto) "
@@ -604,14 +614,16 @@ def obtener_DatosConsulta():
         inv = session.read_transaction(obtener_todos_investiadores)
         proy = session.read_transaction(obtener_todos_proyectos)
         art = session.read_transaction(obtener_todos_articulos)
-    return jsonify(inv,proy,art)
+        areaConocimiento = session.read_transaction(obtener_todas_AreasConocimiento)
+    return jsonify(inv,proy,art,areaConocimiento)
 
 @app.route('/admin/Consultas', methods=['POST'])
 def tipoConsultas():
     try:
         tipo_consulta = int(request.json.get('tipoConsulta'))
         BuscarNombreInvestigadorID = request.json.get('BuscarNombreInvestigadorID')
-        
+        BuscarNombreProyectoID = request.json.get('BuscarNombreProyectoID')
+        BuscarAreaConocimientoID = request.json.get('BuscarAreaConocimientoID')
         if tipo_consulta == 1:
             with driver.session() as session:  
                 resultados = session.write_transaction(obtener_T5_AreasConocimiento)
@@ -624,16 +636,12 @@ def tipoConsultas():
         if tipo_consulta == 4:
             with driver.session() as session:  
                 resultados = session.write_transaction(obtener_InfoInv_Proyectos, BuscarNombreInvestigadorID)
-
         if tipo_consulta == 5:
-            print("Se debe crear...")
-
-        if tipo_consulta == 6:
-            print("Se debe crear...")
-
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_InfoProy, BuscarNombreProyectoID)
         if tipo_consulta == 7:
-            print("Se debe crear...")
-
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_InfoAreaConocimiento, BuscarAreaConocimientoID)
         if tipo_consulta == 8:
             with driver.session() as session:  
                 resultados = session.write_transaction(obtener_InfoInv_Colegas, BuscarNombreInvestigadorID)

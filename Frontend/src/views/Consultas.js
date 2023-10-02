@@ -15,8 +15,7 @@ import {
 } from "react-bootstrap";
 
 function TableList() {
-  //Post  
-  const AreaConocimiento = ["Ciencias Ambientales", "Informática", "Nanociencia"]; 
+  //Post   
   const NombrePublicaciones =["Publicación 1", "Publicación 2", "Publicación 3", "Publicación 4"];
   
   //Busqueda de un(a) investigador(a)
@@ -26,10 +25,19 @@ function TableList() {
   const [infoProyectosInv, setinfoProyectosInv] = useState([]);
   //Busqueda de un proyecto
   const [NombreProyecto, setNombreProyecto] = useState([]);
-  const [BuscarNombreProyecto, setBuscarNombreProyecto] = useState("");
+  const [BuscarNombreProyectoID, setBuscarNombreProyectoID] = useState("");
+  const [infoNombreProyecto, setinfoNombreProyecto] = useState([]);
+  const [infoNombreInv, setinfoNombreInv] = useState([]);
+  const [infoNombreArticulo, setinfoNombreArticulo] = useState([]);
+
+  //Búsqueda por área de conocimiento
+  const [BuscarAreaConocimientoID, setBuscarAreaConocimientoID] = useState("");
+  const [AreaConocimiento, setAreaConocimiento] = useState([]);
+  const [infoACProy, setinfoACProy] = useState([]);
+  const [infoACPubl, setinfoACPubl] = useState([]);
+
   //Busqueda de colegas
   const [infoColega, setinfoColegas] = useState([]);
-  const [BuscarAreaConocimiento, setBuscarAreaConocimiento] = useState("");
   const [BuscarNombrePublicacion, setBuscarNombrePublicacion] = useState([]);
   const [tipoConsulta, setTipoConsulta] = useState('1');
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,8 +90,19 @@ function TableList() {
       console.error('Error al obtener datos del backend:', error);
     });
   };
+  ///////////////////////// Búsqueda por área de conocimiento
+  const handleObtenerAreaConocimiento = () => {
+    // Realiza una solicitud GET al backend para obtener datos
+    axios.get("http://localhost:8080/admin/Consultas")
+    .then(response => {
+      // En este punto, `response.data` contiene los datos recibidos del backend
+      setAreaConocimiento(response.data[3])
+    })
+    .catch(error => {
+      console.error('Error al obtener datos del backend:', error);
+    });
+  };
   /////////////////////////
-  
   useEffect(() => {
     console.log('Valor seleccionado:', tipoConsulta);
     if (tipoConsulta === "4") {
@@ -93,7 +112,7 @@ function TableList() {
     }if(tipoConsulta === "6"){
       //
     }if(tipoConsulta === "7"){
-      //
+      handleObtenerAreaConocimiento();
     }
     else {
       handleObtenerInv();
@@ -104,7 +123,9 @@ function TableList() {
     // Aquí, envía los datos al backend Flask utilizando Axios
     axios.post("http://localhost:8080/admin/Consultas", {
       tipoConsulta,
-      BuscarNombreInvestigadorID
+      BuscarNombreInvestigadorID,
+      BuscarNombreProyectoID,
+      BuscarAreaConocimientoID
     })
     .then(response => {
       if (tipoConsulta === "1") {
@@ -117,6 +138,15 @@ function TableList() {
         const { investigador, proyectos_afiliados } = response.data.resultados;
         setinfoInv(investigador);
         setinfoProyectosInv(proyectos_afiliados);
+      }if(tipoConsulta === "5"){
+        const { proyecto, investigadores,publicaciones } = response.data.resultados;
+        setinfoNombreProyecto(proyecto);
+        setinfoNombreInv(investigadores);
+        setinfoNombreArticulo(publicaciones);      
+      }if(tipoConsulta === "7"){
+        const { publicaciones, proyectos } = response.data.resultados; 
+        setinfoACProy(proyectos),
+        setinfoACPubl(publicaciones);
       }if(tipoConsulta === "8"){
         const { investigador, colegas } = response.data.resultados;
         setinfoInv(investigador);
@@ -176,8 +206,8 @@ function TableList() {
               <Form.Label>Proyectos</Form.Label>
                 <Form.Control
                   as="select"
-                  value={BuscarNombreProyecto}
-                  onChange={(e) => setBuscarNombreProyecto(e.target.value)}
+                  value={BuscarNombreProyectoID}
+                  onChange={(e) => setBuscarNombreProyectoID(e.target.value)}
                 >
                   {NombreProyecto.map(({ tituloPr, idPr }) => (
                     <option key={idPr} value={idPr}>
@@ -211,11 +241,11 @@ function TableList() {
               <br /> {/* Salto de línea */}
                 <Form.Label>Areas de conocimiento</Form.Label>
                   <Form.Control as="select"
-                    value={BuscarAreaConocimiento} 
-                    onChange={(e) => setBuscarAreaConocimiento(e.target.value)}> 
-                    {AreaConocimiento.map((BuscarAreaConocimiento) => (
-                    <option key={BuscarAreaConocimiento} value={BuscarAreaConocimiento}>
-                        {BuscarAreaConocimiento}
+                    value={BuscarAreaConocimientoID} 
+                    onChange={(e) => setBuscarAreaConocimientoID(e.target.value)}> 
+                    {AreaConocimiento.map((BuscarAreaConocimientoID) => (
+                    <option key={BuscarAreaConocimientoID} value={BuscarAreaConocimientoID}>
+                        {BuscarAreaConocimientoID}
                     </option>
                     ))}
                   </Form.Control>
@@ -415,13 +445,15 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>5</td>
-                      <td>xd</td>
-                      <td>2018</td>
-                      <td>56</td>
-                      <td>Mate</td>
-                    </tr>
+                    {infoNombreProyecto.map((item, index) => (
+                      <tr key={index}>
+                        <td>{BuscarNombreProyectoID}</td>
+                        <td>{item.tituloProyecto}</td>
+                        <td>{item.annoInicio}</td>
+                        <td>{item.duracionMeses}</td>
+                        <td>{item.areaConocimiento}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
@@ -442,9 +474,15 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      
-                    </tr>
+                    {infoNombreInv.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.idInvestigador}</td>
+                        <td>{item.nombreCompleto}</td>
+                        <td>{item.tituloAcademico}</td>
+                        <td>{item.institucion}</td>
+                        <td>{item.email}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
@@ -464,9 +502,14 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      
-                    </tr>
+                    {infoNombreArticulo.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.idPub}</td>
+                        <td>{item.titulo_publicacion}</td>
+                        <td>{item.anno_publicacion}</td>
+                        <td>{item.nombre_revista}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
@@ -557,38 +600,21 @@ function TableList() {
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
               <Card.Header>
-                <Card.Title as="h4">Nombre de area de conocimiento</Card.Title>
+                <Card.Title as="h4">Nombre de la area: {BuscarAreaConocimientoID}</Card.Title>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
-                  <thead>
-                    <tr>
-                      <th className="border-0">Nombre de investigadores(as)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>aldo</td>
-                    </tr>
-                  </tbody>
                   <thead>
                     <tr>
                       <th className="border-0">Nombre de proyectos</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Proyecto 1</td>
-                    </tr>
-                    <tr>
-                      <td>Proyecto 2</td>
-                    </tr>
-                    <tr>
-                      <td>Proyecto 3</td>
-                    </tr>
-                    <tr>
-                      <td>Proyecto 4</td>
-                    </tr>
+                    {infoACProy.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item}</td>
+                      </tr>
+                    ))}
                   </tbody>
                   <thead>
                     <tr>
@@ -596,9 +622,11 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Publicaciones 1</td>
-                    </tr>
+                    {infoACPubl.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
