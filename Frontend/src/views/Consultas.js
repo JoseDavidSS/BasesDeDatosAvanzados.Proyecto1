@@ -27,6 +27,9 @@ function TableList() {
   //Busqueda de un proyecto
   const [NombreProyecto, setNombreProyecto] = useState([]);
   const [BuscarNombreProyecto, setBuscarNombreProyecto] = useState("");
+  const [infoNombreProyecto, setinfoNombreProyecto] = useState([]);
+  const [infoNombreInv, setinfoNombreInv] = useState([]);
+  const [infoNombreArticulo, setinfoNombreArticulo] = useState([]);
 
   const [BuscarColega, setBuscarColega] = useState("");
   const [BuscarAreaConocimiento, setBuscarAreaConocimiento] = useState("");
@@ -104,7 +107,8 @@ function TableList() {
     // Aquí, envía los datos al backend Flask utilizando Axios
     axios.post("http://localhost:8080/admin/Consultas", {
       tipoConsulta,
-      BuscarNombreInvestigadorID
+      BuscarNombreInvestigadorID,
+      BuscarNombreProyecto
     })
     .then(response => {
       if (tipoConsulta === "1") {
@@ -117,6 +121,11 @@ function TableList() {
         const { investigador, proyectos_afiliados } = response.data.resultados;
         setinfoInv(investigador);
         setinfoProyectosInv(proyectos_afiliados);
+      }if(tipoConsulta === "5"){
+        const { proyecto, investigadores,publicaciones } = response.data.resultados;
+        setinfoNombreProyecto(proyecto);
+        setinfoNombreInv(investigadores);
+        setinfoNombreArticulo(publicaciones);      
       }
       console.log("Resultados almacenados en la lista:", response.data.resultados);
     })
@@ -410,13 +419,15 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>5</td>
-                      <td>xd</td>
-                      <td>2018</td>
-                      <td>56</td>
-                      <td>Mate</td>
-                    </tr>
+                    {infoNombreProyecto.map((item, index) => (
+                      <tr key={index}>
+                        <td>{BuscarNombreProyecto}</td>
+                        <td>{item.tituloProyecto}</td>
+                        <td>{item.annoInicio}</td>
+                        <td>{item.duracionMeses}</td>
+                        <td>{item.areaConocimiento}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
@@ -437,9 +448,15 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      
-                    </tr>
+                    {infoNombreInv.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.idInvestigador}</td>
+                        <td>{item.nombreCompleto}</td>
+                        <td>{item.tituloAcademico}</td>
+                        <td>{item.institucion}</td>
+                        <td>{item.email}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
@@ -459,9 +476,14 @@ function TableList() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      
-                    </tr>
+                    {infoNombreArticulo.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.idPub}</td>
+                        <td>{item.titulo_publicacion}</td>
+                        <td>{item.anno_publicacion}</td>
+                        <td>{item.nombre_revista}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>

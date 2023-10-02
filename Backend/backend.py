@@ -572,6 +572,47 @@ def obtener_InfoInv_Proyectos(tx, id):
     
     return {"investigador": info_investigador, "proyectos_afiliados": proyectos_afiliados}
 
+def obtener_InfoProy(tx, idProy):
+    # Consulta para obtener información de publicaciones relacionadas con el proyecto
+    query_publicaciones = (
+        f"MATCH (publicacion:Publicacion)-[:RELACIONADO_A]->(proyecto:Proyecto {{idPry: '{idProy}'}}) "
+        "RETURN publicacion.anno_publicacion AS anno_publicacion, "
+        "publicacion.idPub AS idPub, "
+        "publicacion.nombre_revista AS nombre_revista, "
+        "publicacion.titulo_publicacion AS titulo_publicacion"
+    )
+    result_publicaciones = tx.run(query_publicaciones)
+    info_publicaciones = [dict(record) for record in result_publicaciones]
+
+    # Consulta para obtener información de investigadores afiliados al proyecto
+    query_investigadores = (
+        f"MATCH (p:Proyecto {{idPry: '{idProy}'}})<-[:AFILIADO_A]-(i:Investigador) "
+        "RETURN i.nombre_completo AS nombreCompleto, "
+        "i.institucion AS institucion, "
+        "i.titulo_academico AS tituloAcademico, "
+        "i.id AS idInvestigador, "
+        "i.email AS email"
+    )
+    result_investigadores = tx.run(query_investigadores)
+    info_investigadores = [dict(record) for record in result_investigadores]
+
+    # Consulta para obtener información específica del proyecto
+    query_proyecto = (
+        f"MATCH (p:Proyecto {{idPry: '{idProy}'}}) "
+        "RETURN p.anno_inicio AS annoInicio, "
+        "p.area_conocimiento AS areaConocimiento, "
+        "p.duracion_meses AS duracionMeses, "
+        "p.idPry AS idProyecto, "
+        "p.titulo_proyecto AS tituloProyecto"
+    )
+    result_proyecto = tx.run(query_proyecto)
+    info_proyecto = [dict(record) for record in result_proyecto]
+
+    return {
+        "publicaciones": info_publicaciones,
+        "investigadores": info_investigadores,
+        "proyecto": info_proyecto
+    }
 
 
 @app.route('/admin/Consultas', methods=['GET'])
@@ -587,6 +628,7 @@ def tipoConsultas():
     try:
         tipo_consulta = int(request.json.get('tipoConsulta'))
         BuscarNombreInvestigadorID = request.json.get('BuscarNombreInvestigadorID')
+        BuscarNombreProyecto = request.json.get('BuscarNombreProyecto')
         
         if tipo_consulta == 1:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
@@ -600,7 +642,10 @@ def tipoConsultas():
         if tipo_consulta == 4:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
                 resultados = session.write_transaction(obtener_InfoInv_Proyectos, BuscarNombreInvestigadorID)
-        
+        if tipo_consulta == 5:
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_InfoProy, BuscarNombreProyecto)
+
         print("tipoConsulta: ", resultados)
         # Prepara la respuesta como un objeto JSON y envíala
         return jsonify({"resultados": resultados})
