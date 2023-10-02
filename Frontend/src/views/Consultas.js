@@ -16,8 +16,6 @@ import {
 
 function TableList() {
   //Post   
-  const NombrePublicaciones =["Publicación 1", "Publicación 2", "Publicación 3", "Publicación 4"];
-  
   //Busqueda de un(a) investigador(a)
   const [NombreInv, setNombreInv] = useState([]);
   const [BuscarNombreInvestigadorID, setBuscarNombreInvestigadorID] = useState("");
@@ -29,6 +27,12 @@ function TableList() {
   const [infoNombreProyecto, setinfoNombreProyecto] = useState([]);
   const [infoNombreInv, setinfoNombreInv] = useState([]);
   const [infoNombreArticulo, setinfoNombreArticulo] = useState([]);
+
+  //Búsqueda de publicaciones
+  const [DatosPublicaciones, setDatosPublicaciones] = useState([]);
+  const [BuscarNombrePublicacionID, setBuscarNombrePublicacionID] = useState([]);
+  const [infoPubl, setinfoPubl] = useState([]);
+  const [infoPublProy, setinfoPublProy] = useState([]);
 
   //Búsqueda por área de conocimiento
   const [BuscarAreaConocimientoID, setBuscarAreaConocimientoID] = useState("");
@@ -90,6 +94,22 @@ function TableList() {
       console.error('Error al obtener datos del backend:', error);
     });
   };
+  ///////////////////////// Búsqueda de publicaciones
+  const handleObtenerPubli = () => {
+    // Realiza una solicitud GET al backend para obtener datos
+    axios.get("http://localhost:8080/admin/Consultas")
+    .then(response => {
+      // En este punto, `response.data` contiene los datos recibidos del backend
+      const datos = response.data[2].map(({idPu,tituloPu}) => ({
+        idPu,
+        tituloPu
+      }));
+      setDatosPublicaciones(datos);
+    })
+    .catch(error => {
+      console.error('Error al obtener datos del backend:', error);
+    });
+  };
   ///////////////////////// Búsqueda por área de conocimiento
   const handleObtenerAreaConocimiento = () => {
     // Realiza una solicitud GET al backend para obtener datos
@@ -110,7 +130,7 @@ function TableList() {
     }if(tipoConsulta === "5"){
       handleObtenerProy();
     }if(tipoConsulta === "6"){
-      //
+      handleObtenerPubli();
     }if(tipoConsulta === "7"){
       handleObtenerAreaConocimiento();
     }
@@ -125,7 +145,8 @@ function TableList() {
       tipoConsulta,
       BuscarNombreInvestigadorID,
       BuscarNombreProyectoID,
-      BuscarAreaConocimientoID
+      BuscarAreaConocimientoID,
+      BuscarNombrePublicacionID
     })
     .then(response => {
       if (tipoConsulta === "1") {
@@ -142,8 +163,13 @@ function TableList() {
         const { proyecto, investigadores,publicaciones } = response.data.resultados;
         setinfoNombreProyecto(proyecto);
         setinfoNombreInv(investigadores);
-        setinfoNombreArticulo(publicaciones);      
-      }if(tipoConsulta === "7"){
+        setinfoNombreArticulo(publicaciones);     
+      }if(tipoConsulta === "6"){
+        const { publicaciones,proyectos } = response.data.resultados;
+        setinfoPubl(publicaciones);
+        setinfoPublProy(proyectos);
+      }
+      if(tipoConsulta === "7"){
         const { publicaciones, proyectos } = response.data.resultados; 
         setinfoACProy(proyectos),
         setinfoACPubl(publicaciones);
@@ -220,19 +246,23 @@ function TableList() {
           )}
           {(tipoConsulta === "6") &&(
             <Col md="6" className="d-flex align-items-end justify-content-start">
-              <div className="button-list">
+              <Form.Group>
                 <br /> {/* Salto de línea */}
-                  {NombrePublicaciones.map((proyecto) => (
-                    <Button
-                      key={proyecto}
-                      variant={BuscarNombrePublicacion.includes(proyecto) ? "success" : "info"}
-                      className="btn-fill"
-                      onClick={() => handleProyectoClick(proyecto)}
-                    >
-                      {proyecto}
-                    </Button>
+                <Form.Label>Publicaciones</Form.Label>
+                <Form.Control
+                  as="select"
+                  multiple
+                  value={BuscarNombrePublicacionID}
+                  style={{ height: '300px', width: '600px'}}
+                  onChange={(e) => setBuscarNombrePublicacionID(Array.from(e.target.selectedOptions, (option) => option.value))}
+                >
+                  {DatosPublicaciones.map(({ tituloPu, idPu }) => (
+                    <option key={idPu} value={idPu}>
+                      {tituloPu}
+                    </option>
                   ))}
-              </div>
+                </Form.Control>
+              </Form.Group>
             </Col>
           )}
           {(tipoConsulta === "7") &&(
@@ -522,72 +552,44 @@ function TableList() {
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
               <Card.Header>
-                <Card.Title as="h4">Nombre de area de conocimiento</Card.Title>
+                <Card.Title as="h4">Informacion de publicaciones </Card.Title>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
                   <thead>
                     <tr>
-                      <th className="border-0">ID</th>
-                      <th className="border-0">Nombre proyecto</th>
-                      <th className="border-0">Nombre investigadores(as)</th>
-                      <th className="border-0">Duracion meses</th>
-                      <th className="border-0">Area de conocimiento</th>
+                      <th>ID Publicación</th>
+                      <th>Título Publicación</th>
+                      <th>Año de Publicación</th>
+                      <th>Nombre de la Revista</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>5</td>
-                      <td>xd</td>
-                      <td>2018</td>
-                      <td>56</td>
-                      <td>Mate</td>
-                    </tr>
+                    {infoPubl.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item[0]}</td>
+                        <td>{item[3]}</td>
+                        <td>{item[1]}</td>
+                        <td>{item[2]}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
-              </Card.Body>
-            </Card>
-            <Card className="strpied-tabled-with-hover">
-              <Card.Header>
-                <Card.Title as="h4">Investigadores(as)</Card.Title>
-              </Card.Header>
-              <Card.Body className="table-full-width table-responsive px-0">
+                <Card.Header>
+                  <Card.Title as="h4"> Información de Proyectos Relacionados </Card.Title>
+                </Card.Header>
                 <Table className="table-hover table-striped">
                   <thead>
                     <tr>
-                      <th className="border-0">ID</th>
-                      <th className="border-0">Nombre completo</th>
-                      <th className="border-0">Titulo academinco</th>
-                      <th className="border-0">Institución en la cual labora</th>
-                      <th className="border-0">Correo electronico</th>
+                      <th>Título del Proyecto</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      
-                    </tr>
-                  </tbody>
-                </Table>
-              </Card.Body>
-            </Card>
-            <Card className="strpied-tabled-with-hover">
-              <Card.Header>
-                <Card.Title as="h4">Publicaciones</Card.Title>
-              </Card.Header>
-              <Card.Body className="table-full-width table-responsive px-0">
-                <Table className="table-hover table-striped">
-                  <thead>
-                    <tr>
-                      <th className="border-0">ID</th>
-                      <th className="border-0">Nombre de la publicación</th>
-                      <th className="border-0">Año de publicación</th>
-                      <th className="border-0">Nombre de la revista</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      
-                    </tr>
+                    {infoPublProy.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>

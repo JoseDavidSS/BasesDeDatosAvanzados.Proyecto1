@@ -676,6 +676,33 @@ def obtener_DatosConsulta():
         areaConocimiento = session.read_transaction(obtener_todas_AreasConocimiento)
     return jsonify(inv,proy,art,areaConocimiento)
 
+def obtener_InfoPublicaciones(tx, listaID):
+    publicaciones = []
+    proyectos = []
+
+    for idPub in listaID:
+        # Consulta para obtener detalles de la Publicación según su ID
+        query_publicaciones = (
+            f"MATCH (p:Publicacion {{idPub: '{idPub}'}})"
+            f"RETURN p.anno_publicacion AS annoPublicacion, p.idPub AS idPublicacion, p.nombre_revista AS nombreRevista, p.titulo_publicacion AS tituloPublicacion;"
+        )
+
+        # Consulta para obtener el título del Proyecto relacionado con la Publicación
+        query_proyecto = (
+            f"MATCH (p:Publicacion {{idPub: '{idPub}'}})-[:RELACIONADO_A]->(pr:Proyecto)"
+            f"RETURN pr.titulo_proyecto AS tituloProyecto;"
+        )
+
+        # Ejecutar ambas consultas y obtener los resultados
+        result_publicaciones = tx.run(query_publicaciones)
+        result_proyecto = tx.run(query_proyecto)
+
+        # Almacenar los resultados en las listas correspondientes
+        publicaciones.extend([record for record in result_publicaciones])
+        proyectos.extend([record for record in result_proyecto])
+
+    return {"publicaciones": publicaciones, "proyectos": proyectos}
+
 @app.route('/admin/Consultas', methods=['POST'])
 def tipoConsultas():
     try:
@@ -683,6 +710,7 @@ def tipoConsultas():
         BuscarNombreInvestigadorID = request.json.get('BuscarNombreInvestigadorID')
         BuscarNombreProyectoID = request.json.get('BuscarNombreProyectoID')
         BuscarAreaConocimientoID = request.json.get('BuscarAreaConocimientoID')
+        BuscarNombrePublicacionID = request.json.get('BuscarNombrePublicacionID')
         if tipo_consulta == 1:
             with driver.session() as session:  
                 resultados = session.write_transaction(obtener_T5_AreasConocimiento)
@@ -698,6 +726,9 @@ def tipoConsultas():
         if tipo_consulta == 5:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
                 resultados = session.write_transaction(obtener_InfoProy, BuscarNombreProyectoID)
+        if tipo_consulta == 6:
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_InfoPublicaciones, BuscarNombrePublicacionID)
         if tipo_consulta == 7:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
                 resultados = session.write_transaction(obtener_InfoAreaConocimiento, BuscarAreaConocimientoID)
