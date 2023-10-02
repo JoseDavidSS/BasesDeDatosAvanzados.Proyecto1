@@ -519,6 +519,16 @@ def obtener_todos_proyectos(tx):
     result = tx.run(query)
     proyectos = [dict(record) for record in result]
     return proyectos
+def obtener_todas_AreasConocimiento(tx):
+    query = (
+        "MATCH (n) "
+        "WHERE n.area_conocimiento IS NOT NULL "
+        "RETURN DISTINCT n.area_conocimiento AS area_conocimiento"
+    )
+    result = tx.run(query)
+    areas_conocimiento = [record["area_conocimiento"] for record in result]
+    return areas_conocimiento
+
 def obtener_T5_AreasConocimiento(tx):
     query = (
         "MATCH (p:Proyecto) "
@@ -614,6 +624,23 @@ def obtener_InfoProy(tx, idProy):
         "proyecto": info_proyecto
     }
 
+def obtener_InfoAreaConocimiento(tx, area_conocimiento):
+    # Consulta para obtener títulos de Publicaciones según una área de conocimiento específica
+    query_publicaciones = (
+        f"MATCH (p:Publicacion)-[:RELACIONADO_A]->(pr:Proyecto) WHERE pr.area_conocimiento = '{area_conocimiento}' RETURN p.titulo_publicacion AS titulo"
+    )
+    result_publicaciones = tx.run(query_publicaciones)
+    titulos_publicaciones = [record["titulo"] for record in result_publicaciones]
+
+    # Consulta para obtener títulos de Proyectos según una área de conocimiento específica
+    query_proyectos = (
+        f"MATCH (p:Proyecto) WHERE p.area_conocimiento = '{area_conocimiento}' RETURN p.titulo_proyecto AS titulo"
+    )
+    result_proyectos = tx.run(query_proyectos)
+    titulos_proyectos = [record["titulo"] for record in result_proyectos]
+
+    return {"publicaciones": titulos_publicaciones, "proyectos": titulos_proyectos}
+
 
 @app.route('/admin/Consultas', methods=['GET'])
 def obtener_DatosConsulta():
@@ -621,15 +648,16 @@ def obtener_DatosConsulta():
         inv = session.read_transaction(obtener_todos_investiadores)
         proy = session.read_transaction(obtener_todos_proyectos)
         art = session.read_transaction(obtener_todos_articulos)
-    return jsonify(inv,proy,art)
+        areaConocimiento = session.read_transaction(obtener_todas_AreasConocimiento)
+    return jsonify(inv,proy,art,areaConocimiento)
 
 @app.route('/admin/Consultas', methods=['POST'])
 def tipoConsultas():
     try:
         tipo_consulta = int(request.json.get('tipoConsulta'))
         BuscarNombreInvestigadorID = request.json.get('BuscarNombreInvestigadorID')
-        BuscarNombreProyecto = request.json.get('BuscarNombreProyecto')
-        
+        BuscarNombreProyectoID = request.json.get('BuscarNombreProyectoID')
+        BuscarAreaConocimientoID = request.json.get('BuscarAreaConocimientoID')
         if tipo_consulta == 1:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
                 resultados = session.write_transaction(obtener_T5_AreasConocimiento)
@@ -644,8 +672,10 @@ def tipoConsultas():
                 resultados = session.write_transaction(obtener_InfoInv_Proyectos, BuscarNombreInvestigadorID)
         if tipo_consulta == 5:
             with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
-                resultados = session.write_transaction(obtener_InfoProy, BuscarNombreProyecto)
-
+                resultados = session.write_transaction(obtener_InfoProy, BuscarNombreProyectoID)
+        if tipo_consulta == 7:
+            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+                resultados = session.write_transaction(obtener_InfoAreaConocimiento, BuscarAreaConocimientoID)
         print("tipoConsulta: ", resultados)
         # Prepara la respuesta como un objeto JSON y envíala
         return jsonify({"resultados": resultados})
