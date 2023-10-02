@@ -16,8 +16,7 @@ import {
 
 function TableList() {
   //Post  
-  const AreaConocimiento = ["Ciencias Ambientales", "Informática", "Nanociencia"];
-  const NombreProyecto =["Proyecto 1", "Proyecto 2", "Proyecto 3", "Proyecto 4"]; 
+  const AreaConocimiento = ["Ciencias Ambientales", "Informática", "Nanociencia"]; 
   const NombrePublicaciones =["Publicación 1", "Publicación 2", "Publicación 3", "Publicación 4"];
   
   //Busqueda de un(a) investigador(a)
@@ -25,12 +24,13 @@ function TableList() {
   const [BuscarNombreInvestigadorID, setBuscarNombreInvestigadorID] = useState("");
   const [infoInv, setinfoInv] = useState([]);
   const [infoProyectosInv, setinfoProyectosInv] = useState([]);
-  
+  //Busqueda de un proyecto
+  const [NombreProyecto, setNombreProyecto] = useState([]);
+  const [BuscarNombreProyecto, setBuscarNombreProyecto] = useState("");
 
   const [BuscarColega, setBuscarColega] = useState("");
   const [BuscarAreaConocimiento, setBuscarAreaConocimiento] = useState("");
   const [BuscarNombrePublicacion, setBuscarNombrePublicacion] = useState([]);
-  const [BuscarNombreProyecto, setBuscarNombreProyecto] = useState("");
   const [tipoConsulta, setTipoConsulta] = useState('1');
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Get
@@ -56,7 +56,7 @@ function TableList() {
     axios.get("http://localhost:8080/admin/Consultas")
     .then(response => {
       // En este punto, `response.data` contiene los datos recibidos del backend
-      const nombres = response.data.map(({nombreC,idInv}) => ({
+      const nombres = response.data[0].map(({nombreC,idInv}) => ({
         nombreC,
         idInv
       }));
@@ -66,16 +66,30 @@ function TableList() {
       console.error('Error al obtener datos del backend:', error);
     });
   };
+  ///////////////////////// Búsqueda de un proyecto
+  const handleObtenerProy = () => {
+    // Realiza una solicitud GET al backend para obtener datos
+    axios.get("http://localhost:8080/admin/Consultas")
+    .then(response => {
+      // En este punto, `response.data` contiene los datos recibidos del backend
+      const nombres = response.data[1].map(({tituloPr,idPr}) => ({
+        tituloPr,
+        idPr
+      }));
+      setNombreProyecto(nombres)
+    })
+    .catch(error => {
+      console.error('Error al obtener datos del backend:', error);
+    });
+  };
   /////////////////////////
-  
   
   useEffect(() => {
     console.log('Valor seleccionado:', tipoConsulta);
-
     if (tipoConsulta === "4") {
       handleObtenerInv();
     }if(tipoConsulta === "5"){
-      //
+      handleObtenerProy();
     }if(tipoConsulta === "6"){
       //
     }if(tipoConsulta === "7"){
@@ -103,7 +117,6 @@ function TableList() {
         const { investigador, proyectos_afiliados } = response.data.resultados;
         setinfoInv(investigador);
         setinfoProyectosInv(proyectos_afiliados);
-      }else {
       }
       console.log("Resultados almacenados en la lista:", response.data.resultados);
     })
@@ -157,13 +170,15 @@ function TableList() {
             <Form.Group>
             <br /> {/* Salto de línea */}
               <Form.Label>Proyectos</Form.Label>
-                <Form.Control as="select"
-                  value={BuscarNombreProyecto} 
-                  onChange={(e) => setBuscarNombreProyecto(e.target.value)}> 
-                  {NombreProyecto.map((BuscarNombreProyecto) => (
-                  <option key={BuscarNombreProyecto} value={BuscarNombreProyecto}>
-                      {BuscarNombreProyecto}
-                  </option>
+                <Form.Control
+                  as="select"
+                  value={BuscarNombreProyecto}
+                  onChange={(e) => setBuscarNombreProyecto(e.target.value)}
+                >
+                  {NombreProyecto.map(({ tituloPr, idPr }) => (
+                    <option key={idPr} value={idPr}>
+                      {tituloPr}
+                    </option>
                   ))}
                 </Form.Control>
             </Form.Group>

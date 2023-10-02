@@ -575,10 +575,12 @@ def obtener_InfoInv_Proyectos(tx, id):
 
 
 @app.route('/admin/Consultas', methods=['GET'])
-def obtener_nombreInv():
+def obtener_DatosConsulta():
     with driver.session() as session:
         inv = session.read_transaction(obtener_todos_investiadores)
-    return jsonify(inv)
+        proy = session.read_transaction(obtener_todos_proyectos)
+        art = session.read_transaction(obtener_todos_articulos)
+    return jsonify(inv,proy,art)
 
 @app.route('/admin/Consultas', methods=['POST'])
 def tipoConsultas():
