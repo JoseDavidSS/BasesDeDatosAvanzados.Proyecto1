@@ -27,8 +27,8 @@ function TableList() {
   //Busqueda de un proyecto
   const [NombreProyecto, setNombreProyecto] = useState([]);
   const [BuscarNombreProyecto, setBuscarNombreProyecto] = useState("");
-
-  const [BuscarColega, setBuscarColega] = useState("");
+  //Busqueda de colegas
+  const [infoColega, setinfoColegas] = useState([]);
   const [BuscarAreaConocimiento, setBuscarAreaConocimiento] = useState("");
   const [BuscarNombrePublicacion, setBuscarNombrePublicacion] = useState([]);
   const [tipoConsulta, setTipoConsulta] = useState('1');
@@ -117,6 +117,10 @@ function TableList() {
         const { investigador, proyectos_afiliados } = response.data.resultados;
         setinfoInv(investigador);
         setinfoProyectosInv(proyectos_afiliados);
+      }if(tipoConsulta === "8"){
+        const { investigador, colegas } = response.data.resultados;
+        setinfoInv(investigador);
+        setinfoColegas(colegas);
       }
       console.log("Resultados almacenados en la lista:", response.data.resultados);
     })
@@ -222,7 +226,7 @@ function TableList() {
             <Col md="6" className="d-flex align-items-end justify-content-start">
               <Form.Group>
               <br /> {/* Salto de línea */}
-                <Form.Label>Colegas</Form.Label>
+                <Form.Label>Investigadores(as)</Form.Label>
                   <Form.Control
                     as="select"
                     value={BuscarNombreInvestigadorID}
@@ -327,7 +331,8 @@ function TableList() {
             </Card>
           </Col>
         </Row>
-        )}{tipoConsulta === "4" &&(
+        )}
+        {tipoConsulta === "4" &&(
           <Row>
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
@@ -604,27 +609,31 @@ function TableList() {
         {tipoConsulta === "8" &&(
           <Row>
           <Col md="12">
-            <Card className="strpied-tabled-with-hover">
+          <Card className="strpied-tabled-with-hover">
               <Card.Header>
-                <Card.Title as="h4">Nombres de colegas</Card.Title>
+                <Card.Title as="h4">Investigador(a)</Card.Title>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
                   <thead>
+                    <tr>
                       <th className="border-0">ID</th>
                       <th className="border-0">Nombre completo</th>
                       <th className="border-0">Titulo academinco</th>
                       <th className="border-0">Institución en la cual labora</th>
                       <th className="border-0">Correo electronico</th>
-                    </thead>
-                  <tbody>
-                    <tr>
-                      <td>5</td>
-                      <td>Aldo Cambronero Ureña</td>
-                      <td>PhD</td>
-                      <td>TEC</td>
-                      <td>Cambroneroaldo@gmail.com</td>
                     </tr>
+                  </thead>
+                  <tbody>
+                    {infoInv.map((item, index) => (
+                      <tr key={index}>
+                        <td>{BuscarNombreInvestigadorID}</td>
+                        <td>{item.nombreCompleto}</td>
+                        <td>{item.tituloAcademico}</td>
+                        <td>{item.institucion}</td>
+                        <td>{item.email}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
@@ -637,13 +646,23 @@ function TableList() {
                 <Table className="table-hover table-striped">
                   <thead>
                     <tr>
-                      <th className="border-0">Nombre de investigadores(as)</th>
+                      <th className="border-0">ID</th>
+                      <th className="border-0">Nombre completo</th>
+                      <th className="border-0">Titulo academinco</th>
+                      <th className="border-0">Institución en la cual labora</th>
+                      <th className="border-0">Correo electronico</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>aldo</td>
-                    </tr>
+                    {infoColega.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.idColega}</td>
+                        <td>{item.nombreCompleto}</td>
+                        <td>{item.tituloAcademico}</td>
+                        <td>{item.institucion}</td>
+                        <td>{item.email}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>

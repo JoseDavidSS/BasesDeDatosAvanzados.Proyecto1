@@ -519,6 +519,7 @@ def obtener_todos_proyectos(tx):
     result = tx.run(query)
     proyectos = [dict(record) for record in result]
     return proyectos
+
 def obtener_T5_AreasConocimiento(tx):
     query = (
         "MATCH (p:Proyecto) "
@@ -542,6 +543,7 @@ def obtener_T5_Instituciones(tx):
     result = tx.run(query)
     instituciones = [dict(record) for record in result]
     return instituciones
+
 def obtener_T5_Investigadores(tx):
     query = (
         "MATCH (i:Investigador)-[:AFILIADO_A]->(p:Proyecto) "
@@ -572,7 +574,29 @@ def obtener_InfoInv_Proyectos(tx, id):
     
     return {"investigador": info_investigador, "proyectos_afiliados": proyectos_afiliados}
 
+def obtener_InfoInv_Colegas(tx, id):
+    query_investigador = (
+        f"MATCH (i:Investigador {{id: '{id}'}}) "
+        "RETURN i.nombre_completo AS nombreCompleto, i.institucion AS institucion, i.titulo_academico AS tituloAcademico, i.email AS email;"
+    )
+    result_investigador = tx.run(query_investigador)
+    info_investigador = [dict(record) for record in result_investigador]
+    print(info_investigador)
+    print(id)
 
+    query_colegas = (
+        "MATCH (in1:Investigador)-[:AFILIADO_A]->(proy:Proyecto)<-[:AFILIADO_A]-(in2:Investigador) "
+        "WHERE in1.id = $id "
+        "RETURN in2.id AS idColega, in2.nombre_completo AS nombreCompleto, in2.institucion AS institucion, in2.titulo_academico AS tituloAcademico, in2.email AS email"
+    )
+
+    print(query_colegas)
+    result_colegas = tx.run(query_colegas, id=id)
+    print(result_colegas)
+    colegas = [dict(record) for record in result_colegas]
+    print(colegas)
+    
+    return {"investigador": info_investigador, "colegas": colegas}
 
 @app.route('/admin/Consultas', methods=['GET'])
 def obtener_DatosConsulta():
@@ -589,20 +613,33 @@ def tipoConsultas():
         BuscarNombreInvestigadorID = request.json.get('BuscarNombreInvestigadorID')
         
         if tipo_consulta == 1:
-            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+            with driver.session() as session:  
                 resultados = session.write_transaction(obtener_T5_AreasConocimiento)
         if tipo_consulta == 2:
-            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+            with driver.session() as session:  
                 resultados = session.write_transaction(obtener_T5_Instituciones)
         if tipo_consulta == 3:
-            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+            with driver.session() as session:  
                 resultados = session.write_transaction(obtener_T5_Investigadores)
         if tipo_consulta == 4:
-            with driver.session() as session:  # Suponiendo que 'driver' sea tu objeto de conexión a Neo4j
+            with driver.session() as session:  
                 resultados = session.write_transaction(obtener_InfoInv_Proyectos, BuscarNombreInvestigadorID)
+
+        if tipo_consulta == 5:
+            print("Se debe crear...")
+
+        if tipo_consulta == 6:
+            print("Se debe crear...")
+
+        if tipo_consulta == 7:
+            print("Se debe crear...")
+
+        if tipo_consulta == 8:
+            with driver.session() as session:  
+                resultados = session.write_transaction(obtener_InfoInv_Colegas, BuscarNombreInvestigadorID)
         
         print("tipoConsulta: ", resultados)
-        # Prepara la respuesta como un objeto JSON y envíala
+
         return jsonify({"resultados": resultados})
     
     except Exception as e:
@@ -617,10 +654,6 @@ def asociar_investigadores_proyectos():
 
         print("Investigador: ", dato_nombre_investigador)
         print("Proyecto: ", dato_nombre_proyecto)
-
-        print(type(dato_nombre_investigador))
-        print(type(dato_nombre_proyecto))
-        print(type(dato_nombre_proyecto[0]))
 
         for proyecto in dato_nombre_proyecto:
             with driver.session() as session:
